@@ -3,24 +3,19 @@ Notes on what I've been learning
 
 ### :pencil2: Todo - 
 
-* Web
-  * fCC
-  * web dev bootcamp
-  * adv. web dev bootcamp
-  * modern react bootcamp
-  * data structures and algos
-  * junior to senior
-  * system design
-  * articles and best practices
-  * roadmaps
-* Python
-  * modern python 3 bootcamp
-  * articles and best practices
-  * roadmaps
-* ML
-  * complete ml and ds
-* Future
-  * imposter's handbook
-  * curious moon
-  * clean code
-  * roadmaps
+* [Teach Yourself Computer Science](https://teachyourselfcs.com/)
+  * Programming
+  * Computer Architecture
+  * Algorithms and Data Structures
+  * Math for CS
+  * Operating Systems
+  * Computer Networking
+  * Databases
+  * [Language and Compilers](http://craftinginterpreters.com/)
+  * Distributed Systems
+* [Jr. to Sr. Developer](https://www.udemy.com/course/the-complete-junior-to-senior-web-developer-roadmap/)
+* [YDKJS](https://github.com/getify/You-Dont-Know-JS)
+* [Design Patterns](https://addyosmani.com/resources/essentialjsdesignpatterns/book/)
+* [Build your own React](https://pomb.us/build-your-own-react/)
+* [SaaS design](https://12factor.net/)
+* [Machine Learning and Data Science](https://www.udemy.com/course/complete-machine-learning-and-data-science-zero-to-mastery/)
