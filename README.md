@@ -3,7 +3,7 @@ Notes on what I've been learning
 
 ### :pencil2: Todo - 
 
-* [Teach Yourself Computer Science](https://teachyourselfcs.com/)
+* [Teach Yourself Computer Science](https://github.com/aTmb405/learn/tree/master/teachyourselfCS)
   * Programming
   * Computer Architecture
   * Algorithms and Data Structures
