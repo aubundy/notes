@@ -6,7 +6,7 @@
 
 Define an element, grab a node, then render it. Let’s replace this with vanilla JS. 
 
-Element
+## Element
 
 replace code inside tags with `createElement(tag name, props, children)`. Babel transforms this for us
 
@@ -33,7 +33,7 @@ const element = {
 `type` - string that specifies type of DOM node to create
 `props` - object with all keys and values from element along with the children property - string/array with more elements
 
-Render
+## Render
 
 Where react changes the DOM
 
