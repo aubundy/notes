@@ -2,6 +2,7 @@
 
 we need to be able to update and delete nodes. We’ll compare the elements we receive on the `render` function to the last fiber tree we committed to the DOM
 
+```
 function commitRoot() {
   commitWork(wipRoot.child)
   currentRoot = wipRoot
@@ -32,9 +33,11 @@ function render(element, container) {
 let nextUnitOfWork = null
 let currentRoot = null
 let wipRoot = null
+```
 
 let’s save a reference to the last commit after we finish the commit. Let’s also add the `alternate` property to every fiber to keep track of the root
 
+```
 function performUnitOfWork(fiber) {
   if (!fiber.dom) {
     fiber.dom = createDom(fiber)
@@ -61,9 +64,11 @@ function reconcileChildren(wipFiber, elements) {
 ​
   while (index < elements.length) {
     const element = elements[index]
+```
 
 then we’ll move code that creates new fibers to a `reconcileChildren` function.
 
+```
 function reconcileChildren(wipFiber, elements) {
   let index = 0
   let oldFiber =
@@ -117,7 +122,7 @@ newFiber = {
 ​
     if (index === 0) {
       wipFiber.child = newFiber
-
+```
 
 in this we’ll reconcile old fibers with new elements by iterating over old fiber children and the array of elements we want to reconcile. We need to compare `element` and `oldFiber` because we want to render element to the DOM.
 
@@ -131,6 +136,7 @@ If they have the same type, create a new fiber that keeps the old fiber DOM node
 use `PLACEMENT` for effectTag whenever the element needs a new DOM node
 use `DELETION` for effectTag whenever we don’t have a new fiber. 
 
+```
 function render(element, container) {
   wipRoot = {
     dom: container,
@@ -147,18 +153,22 @@ let nextUnitOfWork = null
 let currentRoot = null
 let wipRoot = null
 let deletions = null
+```
 
-the WIProot does not have the old fibers whenever committed to the DOM, so we keep track of the nodes to remove in an array
+the `wipRoot` does not have the old fibers whenever committed to the DOM, so we keep track of the nodes to remove in an array
 
+```
 function commitRoot() {
   deletions.forEach(commitWork)
   commitWork(wipRoot.child)
   currentRoot = wipRoot
   wipRoot = null
 }
+```
 
 then we commit the changes to the DOM using the fibers from that array
 
+```
 function commitWork(fiber) {
   if (!fiber) {
     return
@@ -185,11 +195,13 @@ function commitWork(fiber) {
   commitWork(fiber.child)
   commitWork(fiber.sibling)
 }
+```
 
 let’s update the `commitWork` function to handle the new `effectTags`
 if it’s a `PLACEMENT` tag, append DOM node to parent fiber node
 on `DELETION`, do the opposite and remove the child
 
+```
 const isEvent = key => key.startsWith("on")
 const isProperty = key =>
   key !== "children" && !isEvent(key)
@@ -246,6 +258,7 @@ function updateDom(dom, prevProps, nextProps) {
     })
 
 }
+```
 
 on `UPDATE`, update the node props that changed in the `updateDom` function
 compare old fiber props to new fiber props, remove those that are gone and set the new or changed props
