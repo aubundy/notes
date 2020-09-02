@@ -2,7 +2,8 @@
 This book is about language implementation, not a language itself
 ## Parts of a language
 Not much has changed about languages even though so much has changed about computers
-[Implementation analogy image](http://craftinginterpreters.com/image/a-map-of-the-territory/mountain.png)
+
+![Implementation analogy image](http://craftinginterpreters.com/image/a-map-of-the-territory/mountain.png)
 
 ### Scanning/lexing 
 A scanner takes a string of characters and chunks them together into words/tokens
@@ -76,6 +77,6 @@ What’s the difference between a compiler and interpreter? Is similar to asking
 Compiling is an implementation technique that involves translating code to - usually - lower level code
 Compilers don’t execute code, but interpreters take code and runs the program from source
 ￼
-[Language Venn Diagram](http://craftinginterpreters.com/image/a-map-of-the-territory/venn.png)
+![Language Venn Diagram](http://craftinginterpreters.com/image/a-map-of-the-territory/venn.png)
 
 Our second interpreter will live in the middle region too because it will internally compile to bytecode
