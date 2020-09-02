@@ -57,3 +57,5 @@ The github workflow for every time you start up the terminal:
   - ssh add -l lists all current identities -D removes the current identities
  - verify github connection (ssh -T git@github.com)
  - clone repo (git clone repo@repo_address)
+
+### [To change existing Github repo acces from HTTPS to SSH](https://pandammonium.org/how-to-change-a-git-repository-from-https-to-ssh/)
