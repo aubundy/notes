@@ -13,9 +13,14 @@ Notes on what I've been learning
   * Databases
   * [Language and Compilers](https://github.com/aTmb405/learn/tree/master/teachyourselfCS/Language%20and%20Compilers)
   * Distributed Systems
-* [Jr. to Sr. Developer](https://www.udemy.com/course/the-complete-junior-to-senior-web-developer-roadmap/)
-* [YDKJS](https://github.com/getify/You-Dont-Know-JS)
-* [Design Patterns](https://addyosmani.com/resources/essentialjsdesignpatterns/book/)
+* [Jr. to Sr. Developer](https://github.com/aTmb405/learn/tree/master/Jr%20to%20Sr%20Developer)
+  * SSH
+* [Machine Learning and Data Science](https://github.com/aTmb405/learn/tree/master/ML%20and%20Data%20Science)
+  * Pandas
+  * NumPy
+  * Matplotlib
+  * Scikit-learn
 * [Build your own React](https://pomb.us/build-your-own-react/)
-* [SaaS design](https://12factor.net/)
-* [Machine Learning and Data Science](https://www.udemy.com/course/complete-machine-learning-and-data-science-zero-to-mastery/)
+* YDKJS
+* Design Patterns
+* SaaS design
