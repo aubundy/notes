@@ -11,7 +11,7 @@ Notes on what I've been learning
   * Operating Systems
   * Computer Networking
   * Databases
-  * [Language and Compilers](http://craftinginterpreters.com/)
+  * [Language and Compilers](https://github.com/aTmb405/learn/tree/master/teachyourselfCS/Language%20and%20Compilers)
   * Distributed Systems
 * [Jr. to Sr. Developer](https://www.udemy.com/course/the-complete-junior-to-senior-web-developer-roadmap/)
 * [YDKJS](https://github.com/getify/You-Dont-Know-JS)
