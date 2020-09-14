@@ -168,3 +168,194 @@ Each field has a type and a name.
     writer.close();
   }
 ```
+
+`defineAst()` will output the Expression class (`baseName`)
+
+```
+    // The AST classes.
+    for (String type : types) {
+      String className = type.split(":")[0].trim();
+      String fields = type.split(":")[1].trim(); 
+      defineType(writer, baseName, className, fields);
+    }
+```
+How we define each subclass, which calls:
+
+```
+  private static void defineType(
+      PrintWriter writer, String baseName,
+      String className, String fieldList) {
+    writer.println("  static class " + className + " extends " +
+        baseName + " {");
+
+    // Constructor.
+    writer.println("    " + className + "(" + fieldList + ") {");
+
+    // Store parameters in fields.
+    String[] fields = fieldList.split(", ");
+    for (String field : fields) {
+      String name = field.split(" ")[1];
+      writer.println("      this." + name + " = " + name + ";");
+    }
+
+    writer.println("    }");
+
+    // Fields.
+    writer.println();
+    for (String field : fields) {
+      writer.println("    final " + field + ";");
+    }
+
+    writer.println("  }");
+  }
+```
+All this code will declare each field in the class body. It will define a constructor for the class with parameters for each field and initialize them in the body.
+
+## Working with Trees
+
+Since every expression will behave differently at runtime, the interpreter needs to be able to handle each expression type. A bunch of `if else` statements would be too slow, so we’ll create an `interpret()`method on the Expression class so the subclasses can interpret themselves.
+
+### The Expression Problem
+
+￼![OOP Table](http://craftinginterpreters.com/image/representing-code/table.png)
+
+OOP languages like Java assumes all of the code in a row hangs together, so it makes it easy to define a method inside a class. So it becomes easy to “add another row”
+
+￼![Class table](http://craftinginterpreters.com/image/representing-code/rows.png)
+
+But adding a new operation (column) means editing all of these rows.
+
+Functional programming languages flip this around. Functions are easy to add, but types are difficult. - 
+
+￼![Function Table](http://craftinginterpreters.com/image/representing-code/columns.png)
+
+This is called the “expression problem” - it is difficult to add rows and columns at the same time.
+
+### The Visitor pattern
+
+This design pattern is about trying to simulate functional style in an OOP language. We will be able to define a new behavior for a set of types, without touching the types themselves.
+
+```
+  abstract class Pastry {
+        abstract void accept(PastryVisitor visitor);
+  }
+
+  class Beignet extends Pastry {
+    @Override
+    void accept(PastryVisitor visitor) {
+      visitor.visitBeignet(this);
+  }
+
+  class Cruller extends Pastry {
+    @Override
+    void accept(PastryVisitor visitor) {
+      visitor.visitCruller(this);
+  }
+```
+```
+  interface PastryVisitor {
+    void visitBeignet(Beignet beignet); 
+    void visitCruller(Cruller cruller);
+  }
+```
+
+![Food Example](http://craftinginterpreters.com/image/representing-code/visitor.png)
+
+We can add one `accept()` method to each class, but we can pass any visitor to it in the future without touching the pastry class again.
+
+### Visitors for expressions
+
+We shouldn’t assume all visitors will have the same return type, so we’ll let each implementation determine this.
+
+`defineVisitor(writer, baseName, types);`
+```
+  private static void defineVisitor(
+      PrintWriter writer, String baseName, List<String> types) {
+    writer.println("  interface Visitor<R> {");
+
+    for (String type : types) {
+      String typeName = type.split(":")[0].trim();
+      writer.println("    R visit" + typeName + baseName + "(" +
+          typeName + " " + baseName.toLowerCase() + ");");
+    }
+
+    writer.println("  }");
+  }
+```
+
+This loops through all of the subclasses and declares a visit method for each one. This will automatically include return types later on.
+
+```
+    // The base accept() method.
+    writer.println();
+    writer.println("  abstract <R> R accept(Visitor<R> visitor);");
+```
+
+```
+    // Visitor pattern.
+    writer.println();
+    writer.println("    @Override");
+    writer.println("    <R> R accept(Visitor<R> visitor) {");
+    writer.println("      return visitor.visit" +
+        className + baseName + "(this);");
+    writer.println("    }");
+```
+
+Each subclass implements the `abstract()` method and calls the right visit method for its own type.
+
+## A (Not Very) Pretty Printer
+
+When debugging our parser and interpreter, it is useful to look at a parsed syntax tree and make sure it has the structure we expect. Using the debugger would be a chore, so we’ll convert the tree to a string (called a “pretty printer”). 
+
+But we won’t use that here. We will instead print out Lisp syntax, to be better able to see the hierarchy of our syntax. 
+
+￼![Code Structure example](http://craftinginterpreters.com/image/representing-code/expression.png)
+
+This will produce `(* (- 123) (group 45.67))`
+
+Let’s define a new class.
+
+```
+package com.craftinginterpreters.lox;
+
+// Creates an unambiguous, if ugly, string representation of AST nodes.
+class AstPrinter implements Expr.Visitor<String> {
+  String print(Expr expr) {
+    return expr.accept(this);
+  }
+
+  @Override
+  public String visitBinaryExpr(Expr.Binary expr) {
+    return parenthesize(expr.operator.lexeme, expr.left, expr.right);
+  }
+
+  @Override
+  public String visitGroupingExpr(Expr.Grouping expr) {
+    return parenthesize("group", expr.expression);
+  }
+
+  @Override
+  public String visitLiteralExpr(Expr.Literal expr) {
+    if (expr.value == null) return "nil";
+    return expr.value.toString();
+  }
+
+  @Override
+  public String visitUnaryExpr(Expr.Unary expr) {
+    return parenthesize(expr.operator.lexeme, expr.right);
+  }
+
+  private String parenthesize(String name, Expr... exprs) {
+    StringBuilder builder = new StringBuilder();
+
+    builder.append("(").append(name);
+    for (Expr expr : exprs) {
+      builder.append(" ");
+      builder.append(expr.accept(this));
+    }
+    builder.append(")");
+
+    return builder.toString();
+  }
+}
+``` 
