@@ -47,3 +47,54 @@ There are new file types for images, but there isn't complete browser support ye
 - bundle files together
 
 [More on max connections in a browers](https://stackoverflow.com/questions/985431/max-parallel-http-connections-in-a-browser)
+
+## Critical Path
+
+Client browser fetches files from a server. It then begins putting together the DOM based on the HTML file. When it comes across a .css file, it puts together the CSSOM. Whenever it comes across a .js file, it makes the necessary changes to the DOM and CSSOM. Using all three types of files, it puts together the render tree. It uses this render tree to put together the layout and then paint to the screen.
+
+1. HTML file
+  - We want .css files to arrive as early as possible and .js files to arrive as late as possible.
+  - Put `style` tags in `head` and `script` tags at the bottom of `body`.
+2. CSS file
+  - Only load whatever is needed. Use inline CSS or internal css in a `style` tag for above the fold needs. Fewer files needed to be loaded.
+  - Use 'above the fold' loading (check Network tab in Dev Tools. Below the fold files should load after Waterfall red line).
+```
+  <script>
+    const loadStyleSheet = (src) =>{
+        if (document.createStyleSheet) {
+          document.createStyleSheet(src);
+        }
+        else {
+          const stylesheet = document.createElement('link');
+          stylesheet.href = src;
+          stylesheet.rel = 'stylesheet';
+          stylesheet.type = 'text/css';
+          document.getElementsByTagName('head')[0].appendChild(stylesheet);
+        }
+    }
+      // All of the objects are in the DOM, and all the images, scripts, links have finished loading.
+      window.onload = function () {
+        console.log('window done!')
+        loadStyleSheet('./style3.css');
+      };
+  </script>
+```
+  - Use Media queries to download in background if not correct screen type.
+```
+<link rel="stylesheet" href="./style2.css" media="only screen and (min-width:501px)">
+```
+  - Less specificity in css
+```
+/* bad */
+.header .nav .item .link a.important {
+  color: pink;
+}
+
+/* good */
+a.important {
+  color: pink;
+}
+```
+
+
+
