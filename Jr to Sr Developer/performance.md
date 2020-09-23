@@ -95,6 +95,10 @@ a.important {
   color: pink;
 }
 ```
+3. JS - Once a script file is detected, DOM construction is paused. JS is parser blocking.
+  - Load scripts asynchronously. We can use `async` or `defer` inside `script` tags to avoid pausing parsing while the script is being downloaded. Add `async` to anything that doesn't affect the DOM or CSSOM (like tracking or analytical scripts). May change on the browser.
+  - Defer loading of scripts. We can use `defer` inside `script` tags to avoid pausing parsing while the script is being downloaded and delay the execution. This is good if the core functionality does not require JS. May change on the browser.
+  - Minimize DOM manipulation. Use `DOMContentLoaded` and `load` event listeners.
+  - Avoid long running JavaScript. Will be covered more in depth in part 2.
 
-
-
+[More info on async and defer](https://stackoverflow.com/questions/10808109/script-tag-async-defer)
