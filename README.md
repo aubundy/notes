@@ -15,6 +15,7 @@ Notes on what I've been learning
   * Distributed Systems
 * [Jr. to Sr. Developer](https://github.com/aTmb405/learn/tree/master/Jr%20to%20Sr%20Developer)
   * SSH
+  * Performance
 * [Machine Learning and Data Science](https://github.com/aTmb405/learn/tree/master/ML%20and%20Data%20Science)
   * Pandas
   * NumPy
