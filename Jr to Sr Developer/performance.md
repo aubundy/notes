@@ -123,3 +123,10 @@ a.important {
 - [View interactions](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#interactions)
 - [Find scroll performance issues](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#scrolling-performance-issues)
 - [View paint events in realtime](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#paint-flashing)
+
+## HTTP/2 (more in Part 2)
+
+Protocol update that is still compatible with HTTP, but seeks to improve network latency. This will change some of our optimization techniques. Bundling files may not be faster since server requests will be faster.
+
+[Learn more](https://developers.google.com/web/fundamentals/performance/http2/)
+[Learn about HTTP/3](https://blog.cloudflare.com/http3-the-past-present-and-future/)
