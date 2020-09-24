@@ -102,3 +102,24 @@ a.important {
   - Avoid long running JavaScript. Will be covered more in depth in part 2.
 
 [More info on async and defer](https://stackoverflow.com/questions/10808109/script-tag-async-defer)
+
+4. `DOMContentLoaded` -> Render -> Layout -> Paint -> `Load`
+5. JS Events cause a rerender followed by new layout and repainting. This is why we limit DOM manipulation.
+
+## Testing Performance
+
+[PageSpeed Insights](https://developers.google.com/speed/pagespeed/insights/)
+[WebPageTest](https://www.webpagetest.org/)
+
+## [Prefetching, Preloading, Prebrowsing](https://css-tricks.com/prefetching-preloading-prebrowsing/)
+
+## More performance tools
+
+- [View main thread activities in a table](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#activities)
+- [View main thread activities in realtime](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#main)
+- [Analyze animation FPS](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#fps)
+- [Learn to use the Performance Monitor](https://developers.google.com/web/updates/2017/11/devtools-release-notes#perf-monitor)
+- [Capture screenshots of performance tests](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#screenshots)
+- [View interactions](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#interactions)
+- [Find scroll performance issues](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#scrolling-performance-issues)
+- [View paint events in realtime](https://developers.google.com/web/tools/chrome-devtools/evaluate-performance/reference#paint-flashing)
