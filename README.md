@@ -25,3 +25,4 @@ Notes on what I've been learning
 * YDKJS
 * Design Patterns
 * SaaS design
+* Clean code patterns
