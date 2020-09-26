@@ -35,7 +35,7 @@ minimize html, css, and js files - remove whitespace, etc. so the machine reads 
 - Use image CDNs like [imigx](https://www.imgix.com/).
 - Remove image metadata.
 
-There are new file types for images, but there isn't complete browser support yet.
+There are [new file types for images](https://web.dev/uses-webp-images/?utm_source=lighthouse&utm_medium=unknown), but there isn't complete browser support yet. JPEG 2000, JPEG XR, and WebP have superior compression and quality compared to older image formats.[WebP works on Chrome and Opera](https://caniuse.com/webp).
 
 [More on image file types](https://99designs.com/blog/tips/image-file-types/)
 [More on images and page speec](https://pageweight.imgix.com/)
