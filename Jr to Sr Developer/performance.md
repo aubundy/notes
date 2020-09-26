@@ -54,7 +54,7 @@ Serve different image size depending on device type. It is common to serve 3-5 d
 The resource specified by the `src` attribute should be large enough to work with all device sizes. `srcset` allows you to specify the image size of the different sources available. The `sizes` attribute tells the browser how wide the image will be when it is displayed.
 
 [More on image file types](https://99designs.com/blog/tips/image-file-types/)
-[More on images and page speec](https://pageweight.imgix.com/)
+[More on images and page speed](https://pageweight.imgix.com/)
 [More on selecting image file type](https://www.sitepoint.com/gif-png-jpg-which-one-to-use/)
 
 ## Optimize file transfer
