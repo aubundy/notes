@@ -51,7 +51,7 @@ Image CDNs can yield a 40-80% savings in file size. They create new versions of 
 
 Serve different image size depending on device type. It is common to serve 3-5 different versions of an image. The `<img>` tag's `src`, `srcset`, and `sizes` attributes all interact to achieve this end result. 
 
-The resource specified by the `src` attribute should be large enough to work with all device sizes.
+The resource specified by the `src` attribute should be large enough to work with all device sizes. `srcset` allows you to specify the image size of the different sources available. The `sizes` attribute tells the browser how wide the image will be when it is displayed.
 
 [More on image file types](https://99designs.com/blog/tips/image-file-types/)
 [More on images and page speec](https://pageweight.imgix.com/)
