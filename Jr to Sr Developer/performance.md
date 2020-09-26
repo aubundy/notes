@@ -35,7 +35,23 @@ minimize html, css, and js files - remove whitespace, etc. so the machine reads 
 - Use image CDNs like [imigx](https://www.imgix.com/).
 - Remove image metadata.
 
+### New Image Formats
+
 There are [new file types for images](https://web.dev/uses-webp-images/?utm_source=lighthouse&utm_medium=unknown), but there isn't complete browser support yet. JPEG 2000, JPEG XR, and WebP have superior compression and quality compared to older image formats.[WebP works on Chrome and Opera](https://caniuse.com/webp).
+
+### [Lazy-loading Images](https://web.dev/browser-level-image-lazy-loading/)
+
+Lazy-loading can delay the loading of images until they are near the viewport. It is supported by many browsers, and the ones that do not support it, simplay ignore it.
+
+### [Image CDNs](https://web.dev/image-cdns/)
+
+Image CDNs can yield a 40-80% savings in file size. They create new versions of images as they are needed. They are usually better suited for creating images that are heavily customized for individual clients. Images are usually customized via url provided by the CDN. It also provides transformations and security keys.
+
+### Serve Responsive Images
+
+Serve different image size depending on device type. It is common to serve 3-5 different versions of an image. The `<img>` tag's `src`, `srcset`, and `sizes` attributes all interact to achieve this end result. 
+
+The resource specified by the `src` attribute should be large enough to work with all device sizes.
 
 [More on image file types](https://99designs.com/blog/tips/image-file-types/)
 [More on images and page speec](https://pageweight.imgix.com/)
