@@ -162,3 +162,13 @@ We can use Chrome DevTools -> Performance tab to analyze the parsing and compili
 The Summary tab gives us a circle chart showing the time to load scripts, run scripts (parse and compile), render content, and paint content.
 
 The Bottom-Up tab lets us sort and filter our scripts to find the longest ones.
+
+Limit render-blocking code by analyzing your code using the devtools. Consider adding a performance budget to your JS code.
+
+We want fast time to first paints and fast time to interactive.
+
+## Code Splitting
+
+Since HTTP/2 increases network request speeds, we no longer need to ship only one JS file. The main limiter is now processing the JS after it is downloaded. Since users don't need the entire webpage/webapp code all at the same time, we can split up the code and deliver as needed. This will reduce the amount of work during execution.
+
+We want to ship a minimally functional page, and as more resources arrive, we can lazy load the rest in the background.
