@@ -167,7 +167,7 @@ Limit render-blocking code by analyzing your code using the devtools. Consider a
 
 We want fast time to first paints and fast time to interactive.
 
-## Code Splitting
+### Code Splitting
 
 Since HTTP/2 increases network request speeds, we no longer need to ship only one JS file. The main limiter is now processing the JS after it is downloaded. Since users don't need the entire webpage/webapp code all at the same time, we can split up the code and deliver as needed. This will reduce the amount of work during execution.
 
