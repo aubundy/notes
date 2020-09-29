@@ -148,3 +148,17 @@ Protocol update that is still compatible with HTTP, but seeks to improve network
 
 [Learn more](https://developers.google.com/web/fundamentals/performance/http2/)
 [Learn about HTTP/3](https://blog.cloudflare.com/http3-the-past-present-and-future/)
+
+## Optimizing Code
+
+We can use Chrome DevTools -> Performance tab to analyze the parsing and compiling of our code. This tool will give us a timelime of the code that runs on our page.
+
+- Green line is first paint.
+- Blue line is DOMContentLoaded event
+- Dark Green line is first contentful paint
+- Red line is load event
+- Black line is largest contentful paint
+
+The Summary tab gives us a circle chart showing the time to load scripts, run scripts (parse and compile), render content, and paint content.
+
+The Bottom-Up tab lets us sort and filter our scripts to find the longest ones.
