@@ -151,12 +151,17 @@ Protocol update that is still compatible with HTTP, but seeks to improve network
 
 ## Optimizing Code
 
+- Only load what's needed (use code splitting and [tree shaking](https://developers.google.com/web/fundamentals/performance/optimizing-javascript/tree-shaking/))
+- Avoid blocking main thread
+- Avoid memory leaks
+- Avoid multiple rerendering
+
 We can use Chrome DevTools -> Performance tab to analyze the parsing and compiling of our code. This tool will give us a timelime of the code that runs on our page.
 
 - Green line is first paint.
 - Blue line is DOMContentLoaded event
 - Dark Green line is first contentful paint
-- Red line is load event
+- Red line is load event (clean up event listeners)
 - Black line is largest contentful paint
 
 The Summary tab gives us a circle chart showing the time to load scripts, run scripts (parse and compile), render content, and paint content.
@@ -172,3 +177,126 @@ We want fast time to first paints and fast time to interactive.
 Since HTTP/2 increases network request speeds, we no longer need to ship only one JS file. The main limiter is now processing the JS after it is downloaded. Since users don't need the entire webpage/webapp code all at the same time, we can split up the code and deliver as needed. This will reduce the amount of work during execution.
 
 We want to ship a minimally functional page, and as more resources arrive, we can lazy load the rest in the background.
+
+With CRA, we can use `import` inside of our code, and it will know to delay loading that code until it is needed. This is useful for route-based code splitting.
+
+```
+onRouteChange = (route) => {
+  if (route === 'page1') {
+    this.setState({route: route});
+  } else if (route === 'page2') {
+    import('./components/Page2).then(Page2 => {
+      this.setState({route: route, component: Page2.default});
+    });
+  } else if (route === 'page3') {
+    import('./components/Page3).then(Page3 => {
+      this.setState({route: route, component: Page3.default});
+    });
+  }
+}
+
+...
+
+if (this.state.route === 'page1') {
+  return <Page1 onRouteChange={this.onRouteChange} />
+} else {
+  return <this.state.component onRouteChange={this.onRouteChange} />
+}
+```
+
+We can check the Network tab in Devtools and see bundle.js vs. chunk.js. After `npm run build`, we can see file sizes after gzip show the size we were able to take off the main.js file.
+
+Using AsyncComponent for route-based code splitting:
+
+```
+import React, { Component } from "react";
+
+export default function asyncComponent(importComponent) {
+  class AsyncComponent extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        component: null
+      };
+    }
+
+    async componentDidMount() {
+      const { default: component } = await importComponent();
+
+      this.setState({
+        component: component
+      });
+    }
+
+    render() {
+      const Component = this.state.component;
+
+      return Component ? <Component {...this.props} /> : null;
+    }
+  }
+
+  return AsyncComponent;
+}
+
+...
+
+import AsyncComponent from './AsyncComponent';
+
+...
+
+if (this.state.route === 'page1') {
+  return <Page1 onRouteChange={this.onRouteChange} />
+} else if (this.state.route === 'page2') {
+  const AsyncPage2 = AsyncComponent(() => import("./Components/Page2"));
+  return <AsyncPage2 onRouteChange={this.onRouteChange} />
+} else {
+  const AsyncPage3 = AsyncComponent(() => import("./Components/Page3"));
+  return <AsyncPage3 onRouteChange={this.onRouteChange} />
+}
+```
+
+Using [React.lazy()](https://reactjs.org/docs/code-splitting.html):
+
+```
+const Page2Lazy = React.lazy(() => import('./Components/Page2'));
+const Page3Lazy = React.lazy(() => import('./Components/Page3'));
+
+...
+    if (this.state.route === 'page1') {
+      return <Page1 onRouteChange={this.onRouteChange} />
+    } else if (this.state.route === 'page2') {
+      return (
+        <Suspense fallback={<div>Loading...</div>}>
+          <Page2Lazy onRouteChange={this.onRouteChange} />
+        </Suspense>
+      );
+    } else {
+      return (
+        <Suspense fallback={<div>Loading...</div>}>
+          <Page3Lazy onRouteChange={this.onRouteChange} />
+        </Suspense>
+      );
+    }
+```
+
+### React Performance
+
+localhost:3000/?react_perf will allow us to analyze our component behavior in the Performance tab in devtools. Redux helps make sure only the components that receive updates will rerender. Analyze the 'reverse Christmas trees' to see the render-blocking code.
+
+[React Developer Tools](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi?hl=en) is also helpful in monitoring performance. You can view changes to your component tree as you use your app. Use ~~"Highlight Updates"~~ Profiler -> Make sure to click "Record why each component rendered while profiling". You'll be able to see when each component rendered and make any necessary changes as a result. This is similar to [why did you render?](https://www.npmjs.com/package/@welldone-software/why-did-you-render).
+
+use `shouldComponentUpdate()`, but use it cautiously since it will be run every time before `render()`
+
+```
+shouldComponentUpdate(nextProps, nextState) {
+  if (this.props.property !== nextProps) {
+    return true;
+  }
+  return false;
+}
+```
+
+use `PureComponent` for components that are stateless and you only want to change if their props change. But do not use them for deeply nested object props.
+
+[More info on setState()](https://medium.com/@wereHamster/beware-react-setstate-is-asynchronous-ce87ef1a9cf3)
+[More more infor on setState()](https://vasanthk.gitbooks.io/react-bits/content/patterns/19.async-nature-of-setState.html)
