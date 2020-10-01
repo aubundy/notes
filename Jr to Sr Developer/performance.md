@@ -300,3 +300,30 @@ use `PureComponent` for components that are stateless and you only want to chang
 
 [More info on setState()](https://medium.com/@wereHamster/beware-react-setstate-is-asynchronous-ce87ef1a9cf3)
 [More more infor on setState()](https://vasanthk.gitbooks.io/react-bits/content/patterns/19.async-nature-of-setState.html)
+
+## Progressive Web Apps
+
+PWAs help web pages behave more like native apps on mobile devices
+
+[Publishing PWA on 3 app stores](http://debuggerdotbreak.judahgabriel.com/2018/04/13/i-built-a-pwa-and-published-it-in-3-app-stores-heres-what-i-learned/)
+[PWAs in 2020](https://firt.dev/pwa-2020/)
+[Top PWAs](https://appsco.pe/)
+
+PWA capability will constantly be changing and improving. [Here's](https://web.dev/pwa-checklist/) an updated checklist for making one.
+
+Three most important parts:
+
+1. HTTPS
+- Use [Let's Encrypt](https://letsencrypt.org/) to get a free TLS certificate.
+- [Cloudflare](https://www.cloudflare.com/) also hosts websites and gives free HTTPS.
+- [Github Pages](https://pages.github.com/) works really well for simple websites.
+2. App Manifest
+- Make sure to have a `<meta name="viewport">` tage in your html file.
+- Use a `manifest.json` file to give instructions for how the app should appear to the user where they would expect to see apps.
+- Use [realfavicongenerator](https://realfavicongenerator.net/) to generate different sized favicons for mobile devices and to create a splash screen.
+3. Service Worker
+Service workers will work in the background off the main thread. This allows for offline experiences.
+- CRA initiates your app with a serviceWorker.js file, you just need to register it.
+- The Service worker acts as a network proxy once its registered. It intercepts any requests to the network and checks to see if you need to communicate with the network, because you may already have those files. The service worker will then access the Cache API.
+- Use [isServiceWorkerReady?](https://jakearchibald.github.io/isserviceworkerready/) to check status of PWA availability across browsers.
+- [PWAs can even give push notifications on mobile devices](https://auth0.com/blog/introduction-to-progressive-web-apps-push-notifications-part-3/)
