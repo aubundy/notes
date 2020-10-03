@@ -190,3 +190,179 @@ describe('CounterButton', () => {
     })
 })
 ```
+
+### Connected components
+
+You can use `redux-mock-store` to mock the store. You can also export the component directly. A third option is to separate a component into a redux connected component and UI component that you test.
+
+```
+import { shallow } from 'enzyme';
+import React from 'react';
+import MainPage from './MainPage';
+
+let wrapper;
+beforeEach(() => {
+    const mockStore = {
+        onRequestRobots: jest.fn();
+        robots: [],
+        searchField: '',
+        isPending: false
+    }
+    wrapper = shallow(<MainPage { ...mockProps }/>);
+});
+
+it('renders MainPage component', () => {
+    expect(wrapper).toMatchSnapshot();
+});
+
+it('filters robots correctly', () => {
+    const mockStore2 = {
+        onRequestRobots: jest.fn();
+        robots: [{
+            id: 3,
+            name: 'John',
+            email: 'john@gmail.com'
+        }],
+        searchField: 'j',
+        isPending: false
+    }
+    const wrapper2 = shallow(<MainPage { ...mockStore2 }/>);
+    expect(wrapper2.instance().filterRobots()).toEqual([{
+            id: 3,
+            name: 'John',
+            email: 'john@gmail.com'
+        }]);
+});
+```
+
+## Testing Redux
+
+### Reducers
+
+```
+import { 
+    CHANGE_SEARCHFIELD,
+    REQUEST_ROBOTS_PENDING,
+    REQUEST_ROBOTS_SUCCESS,
+    REQUEST_ROBOTS_FAILED
+} from './constants;
+
+import * as reducers from './reducers';
+
+describe('searchRobots', () => {
+    const initialStateSearch = {
+        searchField: ''
+    }
+
+    it('should return the initial state', () => {
+        expect(reducers.searchRobots(undefined, {})).toEqual(initialStateSearch);
+    });
+
+    it('should handle CHANGE_SEARCHFIELD', () => {
+        expect(reducers.searchRobots(initialStateSearch, {
+            type: CHANGE_SEARCHFIELD,
+            payload: 'abc'
+        })).toEqual({
+            searchField: 'abc'
+        });
+    });
+});
+
+describe('requestRobots', () => {
+    const initialStateRobots = {
+        robots: [],
+        isPending: false
+    }
+
+    it('should return the initial state', () => {
+        expect(reducers.requestRobots(undefined, {})).toEqual(initialStateRobots);
+    });
+
+    it('should handle REQUEST_ROBOTS_PENDING', () => {
+        expect(reducers.requestRobots(initialStateRobots, {
+            type: REQUEST_ROBOTS_PENDING
+        })).toEqual({
+            robots: [],
+            isPending: true
+        });
+    });
+
+    it('should handle REQUEST_ROBOTS_SUCCESS', () => {
+        expect(reducers.requestRobots(initialStateRobots, {
+            type: REQUEST_ROBOTS_SUCCESS,
+            payload: [{
+                id: '123',
+                name: 'test',
+                email: 'test@gmail.com'
+            }]
+        })).toEqual({
+            robots: [{
+                id: '123',
+                name: 'test',
+                email: 'test@gmail.com'
+            }],
+            isPending: false
+        });
+    });
+    
+    it('should handle REQUEST_ROBOTS_FAILURE', () => {
+        expect(reducers.requestRobots(initialStateRobots, {
+            type: REQUEST_ROBOTS_FAILURE,
+            payload: 'ERROR'
+        })).toEqual({
+            robots: 'ERROR',
+            robots: [],
+            isPending: false
+        });
+    });
+});
+```
+
+### Actions
+
+```
+import { 
+    CHANGE_SEARCHFIELD,
+    REQUEST_ROBOTS_PENDING,
+    REQUEST_ROBOTS_SUCCESS,
+    REQUEST_ROBOTS_FAILED
+} from './constants;
+
+import * as actions from './actions';
+import configureMockStore from 'redux-mock-store';
+import thunkMiddleware from 'redux-thunk';
+
+const mockStore = configureMockStore([thunkMiddleware]); // can export so it's available for all your tests
+
+describe('setSearchField', () => {
+    it('creates an action to search robots', () => {
+        const text = 'wooo';
+        const expectedAction = {
+            type: CHANGE_SEARCHFIELD,
+            payload: text;
+        }
+
+        expect(actions.setSearchField(text)).toEqual(expectedAction);
+    });
+});
+
+describe('requestRobots', () => {
+    it('requests robots API', () => {
+        const store = mockStore();
+        store.dispatch(action.requestRobots());
+        const action = store.getActions();
+        const expectedAction = {
+            type: REQUEST_ROBOTS_PENDING
+        }
+
+        expect(action[0]).toEqual(expectedAction);
+    });
+});
+
+```
+
+Additional Resources -
+
+[nock](https://github.com/nock/nock)
+[supertest](https://github.com/visionmedia/supertest)
+[Lean Testing](https://blog.usejournal.com/lean-testing-or-why-unit-tests-are-worse-than-you-think-b6500139a009)
