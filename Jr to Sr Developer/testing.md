@@ -6,9 +6,9 @@ Tests can be run in different environments - in the console, DOM, headless brows
 
 ## 3 Main Categories
 
-1. Unit tests - tests individual functions and classes. Cheapest and easiest to implement.
-2. Integration tests - how different units of code interacts together.
-3. Automation tests - also known as UI tests. Very expensive to implement.
+1. Unit tests - tests individual functions and classes. Ideally they are pure functions. Cheapest and easiest to implement.
+2. Integration tests - tests how different units of code interacts together. Spies and stubs are used here.
+3. Automation tests - also known as UI/end to end tests. Tests are implemented in the browser or browser-like environment. Very expensive to implement. Its better to set up a different testing flow for automation tests.
 
 ## Testing Libraries
 
@@ -18,4 +18,175 @@ Tests can be run in different environments - in the console, DOM, headless brows
 4. Mocks, Spies, and Stubs -                Jasmine, Jest, Sinon
 5. Code Coverage -                                   Jest, Istanbul
 
-Others - Ava, Tate, Enzyme
+Others - Ava, Tate, Enzyme, WebdriveIO, TestCafe, Nightmare, Cypress, Nightwatch
+
+CRA comes with Jest preinstalled. Here are instructions to install outside CRA.
+
+`npm install --save-dev jest`
+
+```
+"scripts": {
+    "test": "jest --watch *.js"
+}
+```
+
+`.spec.js or .test.js syntax`
+
+## Jest
+
+Writing tests shouldn't be complicated. Structure your code to keep tests simple. Use dependency injection to help your tests and to help write pure functions.
+The more tests, the better. 
+Make your tests fail first, then make them pass one by one.
+[Cheat Sheet](https://github.com/sapegin/jest-cheat-sheet)
+
+`npm test -- --coverage`
+
+### Writing tests
+
+```
+import googleSearch from './script';
+
+dbMock = [...];
+
+describe('googleSearch', () => {
+    it('is searching google', () => {
+        expect(googleSearch('testtest', dbMock)).toEqual([]);
+        expect(googleSearch('dog', dbMock)).toEqual(['dog.com', 'dogpictures.com']);
+    });
+
+    it('works with undefined and null input', () => {
+        expect(googleSearch(undefined, dbMock)).toEqual([]);
+        expect(googleSearch(null, dbMock)).toEqual([]);
+    });
+
+    it('does not return more than 3 matches', () => {
+        expect(googleSearch('.com', dbMock).length).toEqual(3);
+    });
+});
+```
+
+### Asynchronous Tests
+
+```
+import node-fetch from 'node-fetch';
+import swapi from './script2';
+
+it('calls swapi to get people', (done) => {
+    expect.assertions(1);
+    swapi.getPeople(fetch).then(data => {
+        expect(data.count).toEqual(87);
+        done();
+    });
+});
+
+it('calls swapi to get people with a promise', () => {
+    expect.assertions(2);
+    return swapi.getPeoplePromise(fetch).then(data => {
+        expect(data.count).toEqual(87);
+        expect(data.results.length).toBeGreaterThan(5);
+    })
+});
+```
+
+### Mocks/Spies
+
+```
+it('getPeople returns count and results', () => {
+    const mockFetch = jest.fn().mockReturnValue(Promise.resolve({
+        json: () => Promise.resolve({
+            count: 87,
+            results: [0, 1, 2, 3, 4, 5]
+        });
+    }));
+
+    expect.assertions(4);
+    return swapi.getPeoplePromise(mockFetch).then(data => {
+        expect(mockFetch.mock.calls.length).toBe(1);
+        expect(mockFetch).toBeCalledWith('https://swapi.co/api/people);
+        expect(data.count).toEqual(87);
+        expect(data.results.length).toBeGreaterThan(5);
+    });
+});
+
+```
+
+## React Tests
+
+[Enzyme](https://enzymejs.github.io/enzyme/) simplifies testing React components
+
+### Setup Enzyme
+
+`npm i --save-dev enzyme enzyme-adapter-react-16`
+
+Create `setupTests.js` file.
+
+```
+import { configure } from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
+
+configure({ adapter: new Adapter() });
+```
+
+### Writing tests
+
+`shallow()` - best for unit tests in React. It only renders the one component
+`mount()` - does a full DOM render. Useful when a component interacts with DOM or to test a lifecycle method. But it needs the DOM API to work. jsdom works best (standard for CRA);
+`render()` - renders to static HTML. It doesn't need a full DOM.
+
+```
+import { shallow, mount, render } from 'enzyme';
+import React from 'react';
+import Card from './Card';
+
+it('renders Card component', () => {
+    <!-- expect(shallow(<Card />).length).toEqual(1); -->
+    expect(shallow(<Card />)).toMatchSnapshot();
+});
+```
+
+Testing components that depend on props to render
+
+```
+import { shallow, mount, render } from 'enzyme';
+import React from 'react';
+import CardList from './CardList';
+
+it('renders CardList component', () => {
+    const mockRobots = [
+        {
+            id: 1,
+            name: 'John Snow',
+            username: 'JohnJohn',
+            email: 'john@gmail.com'
+        }
+    ];
+    expect(shallow(<CardList robots={mockRobots}/>)).toMatchSnapshot();
+});
+```
+
+Testing stateful components
+
+```
+import { shallow, mount, render } from 'enzyme';
+import React from 'react';
+import CounterButton from './CounterButton';
+
+describe('CounterButton', () => {
+    it('renders CounterButton component', () => {
+        const mockColor = 'red';
+        expect(shallow(<CounterButton color={mockColor}/>)).toMatchSnapshot();
+    });
+
+    it('correctly increments the counter', () => {
+        const mockColor = 'red';
+        const wrapper = shallow(<CounterButton color={mockColor}>);
+
+        wrapper.find('[id='counter']').simulate('click');
+        wrapper.find('[id='counter']').simulate('click');
+        expect(wrapper.state()).toEqual({ count: 2 });
+        wrapper.find('[id='counter']').simulate('keypress');
+        expect(wrapper.state()).toEqual({ count: 3 });
+        expect(wrapper.props().color).toEqual('red');
+    })
+})
+```
