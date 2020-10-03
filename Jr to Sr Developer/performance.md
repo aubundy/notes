@@ -327,3 +327,7 @@ Service workers will work in the background off the main thread. This allows for
 - The Service worker acts as a network proxy once its registered. It intercepts any requests to the network and checks to see if you need to communicate with the network, because you may already have those files. The service worker will then access the Cache API.
 - Use [isServiceWorkerReady?](https://jakearchibald.github.io/isserviceworkerready/) to check status of PWA availability across browsers.
 - [PWAs can even give push notifications on mobile devices](https://auth0.com/blog/introduction-to-progressive-web-apps-push-notifications-part-3/)
+- [Service workers are not accessible in dev mode](https://github.com/facebook/create-react-app/issues/2396)
+
+[More on accessibility](https://www.w3.org/standards/webdesign/accessibility)
+[Progressive Tooling](https://progressivetooling.com/)
