@@ -3,13 +3,14 @@ Notes on what I've been learning
 
 ### :pencil2: Current - 
 
-* [Teach Yourself Computer Science](https://github.com/aTmb405/learn/tree/master/teachyourselfCS)
+* [Crafting Interpreters](https://github.com/aTmb405/learn/tree/master/teachyourselfCS)
   * [Language and Compilers](https://github.com/aTmb405/learn/tree/master/teachyourselfCS/Language%20and%20Compilers)
 * [Jr. to Sr. Developer](https://github.com/aTmb405/learn/tree/master/Jr%20to%20Sr%20Developer)
-  * SSH
-  * Performance
-  * Testing
-  * TypeScript
+  * [SSH](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/ssh.md)
+  * [Performance](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/performance.md)
+  * [Bundlers](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/bundlers.md)
+  * [Testing](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/testing.md)
+  * [TypeScript](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/typescript.md)
 * [Machine Learning and Data Science](https://github.com/aTmb405/learn/tree/master/ML%20and%20Data%20Science)
   * Pandas
   * NumPy
