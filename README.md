@@ -1,4 +1,4 @@
-# :clipboard: Learn
+# :clipboard: Notes
 Notes on what I've been learning
 
 ### :pencil2: Current - 
