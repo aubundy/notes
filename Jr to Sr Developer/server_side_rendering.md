@@ -32,4 +32,56 @@ React was originally built for client-side use, so there can be a lot of bugs or
 
 [Gatsby](https://www.gatsbyjs.com/) is great for documentation sites/static sites. React uses this for their documentation.
 
-[Next.js](https://nextjs.org/) is great for web applications. It's like CRA for SSR websites.
+[Next.js](https://nextjs.org/) is great for web applications. It's like CRA for SSR websites. Has nice error handling, prefetching, TypeScript capabilities, etc built in.
+
+## [Next.js](https://nextjs.org/docs/getting-started)
+
+`npm install next react react-dom`
+
+Create `pages` folder.
+
+```
+"scripts": {
+    "start": "next"
+}
+```
+
+In `pages`:
+
+```
+import Link from 'next/link'; // provides client side routing
+
+const Index = () => (
+    <div>
+        <h1>SSR Magician</h1>
+        {/* <a href='/about'>About</a> */}
+        <Link href='about'> // client side
+            <button>About</button>
+        </Link>
+    </div>
+);
+
+export default Index;
+```
+
+```
+const About = () => {
+    return (
+        <div style={{fontSize: '20px', color: 'blue'}}>
+            <h1>About</h1>
+        </div>
+    )
+}
+
+export default About;
+```
+
+No need to import React, Next does this all for you behind the scenes. Just put React components into the `pages` folder.
+
+[More on routing](https://medium.com/@wilbo/server-side-vs-client-side-routing-71d710e9227f)
+
+Put shared components in a `components` folder.
+
+`npm install isomorphic-unfetch` for using fetch on server side. Use `.getInitialProps()` to fetch inside SSR component.
+
+`npx create-next-app` is fastest way to build new next app.
