@@ -161,5 +161,165 @@ Syntax and static errors are reported before any code is executed. Runtime error
 
 We want users to understand a Lox runtime error has occured, not merely copy Java's runtime errors.
 
+[Negating a Muffin](https://craftinginterpreters.com/image/evaluating-expressions/muffin.png)
+
 ### Detecting runtime errors
 
+Since our interpreter evaluates nested expressions using recursive method calls, we need to unwind out of all of those whenever there is a runtime error.
+
+In `visitUnaryExpr()`:
+
+```
+      case MINUS:
+        checkNumberOperand(expr.operator, right);
+        return -(double)right;
+```
+
+```
+  private void checkNumberOperand(Token operator, Object operand) {
+    if (operand instanceof Double) return;
+    throw new RuntimeError(operator, "Operand must be a number.");
+  }
+```
+
+When the check fails, it throws a `RuntimeError`:
+
+```
+class RuntimeError extends RuntimeException {
+    final Token token;
+  
+    RuntimeError(Token token, String message) {
+       super(message);
+       this.token = token;
+    }
+}
+```
+
+Our class tracks the token that identifies where in the user's code in the runtime error came from. This helps users know where to fix their code.
+
+We need similar checking to the binary operators.
+
+```
+      case GREATER:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left > (double)right;
+      case GREATER_EQUAL:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left >= (double)right;
+      case LESS:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left < (double)right;
+      case LESS_EQUAL:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left <= (double)right;
+      case MINUS:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left - (double)right;
+      case SLASH:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left / (double)right;
+      case STAR:
+        checkNumberOperands(expr.operator, left, right);
+        return (double)left * (double)right;
+```
+
+```
+  private void checkNumberOperands(Token operator, Object left, Object right) {
+    if (left instanceof Double && right instanceof Double) return;
+    throw new RuntimeError(operator, "Operands must be numbers.");
+  }
+```
+
+We evaluate both operands before checking the type of either.
+
+Addition is the odd one out again since it is overloaded for numbers and strings. We just need to fail if neither of the two success cases match.
+
+```
+        if (left instanceof String && right instanceof String) {
+          return (String)left + (String)right;
+        }
+
+        throw new RuntimeError(expr.operator,
+            "Operands must be two numbers or two strings.");
+```
+
+Errors are now being thrown, we just need to catch them.
+
+## 7.4 Hooking Up the Interpreter
+
+The visit methods are the guts of the interpreter class, where the real work happens. We need to wrap a skin around them to interact with the rest of the program.
+
+The Interpreter's public API:
+
+```
+  void interpret(Expr expression) {
+    try {
+      Object value = evaluate(expression);
+      System.out.println(stringify(value));
+    } catch (RuntimeError error) {
+      Lox.runtimeError(error);
+    }
+  }
+```
+
+This takes in a syntax tree for an expression and evaluates it. `evaluate()` will then return an object for the result value. And `interpret()` converts that to a string a shows it to the user:
+
+```
+  private String stringify(Object object) {
+    if (object == null) return "nil";
+
+    if (object instanceof Double) {
+      String text = object.toString();
+      if (text.endsWith(".0")) {
+        text = text.substring(0, text.length() - 2);
+      }
+      return text;
+    }
+
+    return object.toString();
+  }
+```
+
+Since Java has both floating point and integer types, it wants you to know which one you're using. It tells you by adding an explicit .0 to integer-valued doubles. We don't need this, so we remove it.
+
+### Reporting runtime errors
+
+If a runtime rror is thrown while evaluating the expression, `interpret()` catches it. This lets us report the error to the user and continue on. Currently, all our error reporting code lives in the Lox class, so let's add this method to Lox:
+
+```
+  static void runtimeError(RuntimeError error) {
+    System.err.println(error.getMessage() +
+        "\n[line " + error.token.line + "]");
+    hadRuntimeError = true;
+  }
+```
+
+We use the token from RuntimeError to tell the user which line of code produced the error. Eventually, it would be nice to show an entire call stack of how that code was executed.
+
+`runtimeError()` sets this Lox field after showing the error:
+
+`static boolean hadRuntimeError = false;`
+
+which helps in the `runFile()` method:
+
+`if (hadRuntimeError) System.exit(70);`
+
+### Running the interpreter
+
+We can now start using the Lox interpreter:
+
+```
+public class Lox {
+  private static final Interpreter interpreter = new Interpreter();
+  static boolean hadError = false;
+```
+
+The field is static so successive calls to `run()` inside a REPL session reuse the same interpreter. This will help with global variable in the future.
+
+Then, we replace the previous syntax tree printer in `run()` with:
+
+`interpreter.interpret(expression);`
+
+We can now scan, parse, and execute our language.
+
+[Bare bones interpreter](https://craftinginterpreters.com/image/evaluating-expressions/skeleton.png)
