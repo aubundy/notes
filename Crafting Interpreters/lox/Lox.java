@@ -58,9 +58,9 @@ public class Lox {
     interpreter.interpret(expression);
   }
 
-  // static void error(final int line, final String message) {
-  //   report(line, "", message);
-  // }
+  static void error(final int line, final String message) {
+    report(line, "", message);
+  }
 
   private static void report(final int line, final String where, final String message) {
     System.err.println(

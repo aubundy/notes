@@ -2,10 +2,16 @@ package lox;
 
 import java.util.List;
 
-import static lox.TokenType.*;
+import lox.TokenType.*;
 
 class Parser {
-  private static class ParseError extends RuntimeException {}
+  private static class ParseError extends RuntimeException {
+
+    /** Added to fix the above error - 
+     *  The serializable class ParseError does not declare a static final serialVersionUID field of type longJava(536871008)
+     */
+    private static final long serialVersionUID = 6488365868349397756L;
+  }
 
   private final List<Token> tokens;
   private int current = 0;
@@ -29,7 +35,7 @@ class Parser {
   private Expr equality() {
     Expr expr = comparison();
 
-    while (match(BANG_EQUAL, EQUAL_EQUAL)) {
+    while (match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL)) {
       Token operator = previous();
       Expr right = comparison();
       expr = new Expr.Binary(expr, operator, right);
@@ -41,7 +47,7 @@ class Parser {
   private Expr comparison() {
     Expr expr = addition();
 
-    while (match(GREATER, GREATER_EQUAL, LESS, LESS_EQUAL)) {
+    while (match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)) {
       Token operator = previous();
       Expr right = addition();
       expr = new Expr.Binary(expr, operator, right);
@@ -53,7 +59,7 @@ class Parser {
   private Expr addition() {
     Expr expr = multiplication();
 
-    while (match(MINUS, PLUS)) {
+    while (match(TokenType.MINUS, TokenType.PLUS)) {
       Token operator = previous();
       Expr right = multiplication();
       expr = new Expr.Binary(expr, operator, right);
@@ -65,7 +71,7 @@ class Parser {
   private Expr multiplication() {
     Expr expr = unary();
 
-    while (match(SLASH, STAR)) {
+    while (match(TokenType.SLASH, TokenType.STAR)) {
       Token operator = previous();
       Expr right = unary();
       expr = new Expr.Binary(expr, operator, right);
@@ -75,7 +81,7 @@ class Parser {
   }
 
   private Expr unary() {
-    if (match(BANG, MINUS)) {
+    if (match(TokenType.BANG, TokenType.MINUS)) {
       Token operator = previous();
       Expr right = unary();
       return new Expr.Unary(operator, right);
@@ -85,17 +91,17 @@ class Parser {
   }
 
   private Expr primary() {
-    if (match(FALSE)) return new Expr.Literal(false);
-    if (match(TRUE)) return new Expr.Literal(true);
-    if (match(NIL)) return new Expr.Literal(null);
+    if (match(TokenType.FALSE)) return new Expr.Literal(false);
+    if (match(TokenType.TRUE)) return new Expr.Literal(true);
+    if (match(TokenType.NIL)) return new Expr.Literal(null);
 
-    if (match(NUMBER, STRING)) {
+    if (match(TokenType.NUMBER, TokenType.STRING)) {
       return new Expr.Literal(previous().literal);
     }
 
-    if (match(LEFT_PAREN)) {
+    if (match(TokenType.LEFT_PAREN)) {
       Expr expr = expression();
-      consume(RIGHT_PAREN, "Expect ')' after expression.");
+      consume(TokenType.RIGHT_PAREN, "Expect ')' after expression.");
       return new Expr.Grouping(expr);
     }
 
@@ -130,7 +136,7 @@ class Parser {
   }
 
   private boolean isAtEnd() {
-    return peek().type == EOF;
+    return peek().type == TokenType.EOF;
   }
 
   private Token peek() {
@@ -150,7 +156,7 @@ class Parser {
     advance();
 
     while (!isAtEnd()) {
-      if (previous().type == SEMICOLON) return;
+      if (previous().type == TokenType.SEMICOLON) return;
 
       switch (peek().type) {
         case CLASS:
