@@ -9,6 +9,9 @@ Notes on what I've been learning
   * [Bundlers](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/bundlers.md)
   * [Testing](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/testing.md)
   * [TypeScript](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/typescript.md)
+  * [SSR](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/server_side_rendering.md)
+  * [Code Analysis](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/code_analysis.md)
+  * [Docker](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/docker.md)
 * [Crafting Interpreters](https://github.com/aTmb405/notes/tree/master/Crafting%20Interpreters)
 * [Machine Learning and Data Science](https://github.com/aTmb405/learn/tree/master/ML%20and%20Data%20Science)
   * Pandas
