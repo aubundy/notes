@@ -12,6 +12,8 @@ Notes on what I've been learning
   * [SSR](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/server_side_rendering.md)
   * [Code Analysis](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/code_analysis.md)
   * [Docker](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/docker.md)
+  * [Redis](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/redis.md)
+  * [Sessions and JWT](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/sessions_and_jwt.md)
 * [Crafting Interpreters](https://github.com/aTmb405/notes/tree/master/Crafting%20Interpreters)
 * [Machine Learning and Data Science](https://github.com/aTmb405/learn/tree/master/ML%20and%20Data%20Science)
   * Pandas
