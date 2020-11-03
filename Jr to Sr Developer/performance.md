@@ -331,3 +331,56 @@ Service workers will work in the background off the main thread. This allows for
 
 [More on accessibility](https://www.w3.org/standards/webdesign/accessibility)
 [Progressive Tooling](https://progressivetooling.com/)
+
+## CDNs
+
+Caches files in servers around the world for quicker delivery to the user through decreased latency. They also offer security benefits.
+
+[Cloudflare](https://www.cloudflare.com/) is most popular. You just need to update your DNS name server to use Cloudflare.
+
+Amazon (Cloudfront) and Microsoft (Azure) have popular CDNs as well.
+
+## GZIP
+
+Gzip compression of code files is one of the best ways to improve website performance. And by default, all modern browsers allow gzipping. Webpack compresses files using gzip.
+
+In an express app, just install the `compression` middleware. You can check the content encoding method in the Network tab.
+
+```
+const compression = require("compression");
+
+app.use(compression());
+```
+
+[Brotli](https://github.com/google/brotli) is a newer compression algorithm that is roughly 20% better than gzip, but it doesn't have 100% adoption rate yet.
+
+## Database Scaling
+
+1. Identify inefficient queries
+  * Only request what you need
+  * Index your tables to improve queries. It sorts your tables based on the fields you decide on. This does require more memory.
+2. Increase memory
+3. Vertical scaling (Redis, Memcached, etc.)
+  * store a cache of regularly accessed data
+4. Sharding
+  * Separate out your databases
+5. More databases
+6. Database type
+
+## Caching
+
+Temporary storage area for our data for faster access. Caching happens everywhere from our personal computer's CPU to browsers and CDNs.
+
+PWAs use the browser's cache storage.
+
+Express automatically sends Response Headers (Cache Control and ETag) to help the browser set a cache.
+
+[Caching Everywhere](https://www.freecodecamp.org/news/the-hidden-components-of-web-caching-970854fe2c49/)
+[Cache Headers](https://web.dev/http-cache/)
+[Caching and Performance](https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers)
+
+## Load Balancing
+
+Load balancing is used to distribute server requests among multiple servers.
+
+nginx can be used as an effective load balancer/reverse proxy.
