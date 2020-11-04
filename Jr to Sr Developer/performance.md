@@ -383,4 +383,74 @@ Express automatically sends Response Headers (Cache Control and ETag) to help th
 
 Load balancing is used to distribute server requests among multiple servers.
 
-nginx can be used as an effective load balancer/reverse proxy.
+nginx can be used as an effective load balancer/reverse proxy. But creating your own load balancer is becoming less and less common. Many hosting services like Amazon and Digital Ocean provide load balancing solutions that don't involve much code.
+
+### [Nginx](https://nginx.org/en/docs/) load balancer
+
+This simulates a load balancer with 3 servers all inside one Docker container. Normally, these services would be in separate containers.
+
+1. Create nginx folder
+2. Create Dockerfile
+```
+FROM nginx 
+COPY nginx.conf /etc/nginx/nginx.conf
+```
+3. Create nginx.conf file
+```
+worker_processes 1; // how many processes to run on the CPU
+
+events { worker_connections 1024; } // how many connections to allow at any point in time. This depends on the machine
+
+http { 
+  upstream myapp1 {
+    server web1:3000; // match names inside docker-compose
+    server web2:3000;
+    server web3:3000;
+  }
+
+  server {
+    listen 80; // nginx port
+    location / {
+      proxy_pass http://myapp1; // creates a reverse proxy for the load balancer
+    }
+    location ~* \.(css|js|gif|jpeg|png)$ {
+      expires 168h; // store a cache of static files for a specified time period
+    }
+  }
+}
+```
+4. Create docker-compose.yml
+```
+version: '3'
+services:
+  web1:
+    build: .
+    ports:
+      - 3000
+  web2:
+    build: .
+    ports:
+      - 3000
+  web3:
+    build: .
+    ports:
+      - 3000
+  load-balancer:
+    build: nginx/
+    ports:
+      - 80:80
+    links:
+      - web1
+      - web2
+      - web3
+    volumes:
+      # allows you to run docker commands inside container - https://medium.com/lucjuggery/about-var-run-docker-sock-3bfd276e12fd
+      - /var/run/docker.sock:/var/run/docker.sock
+```
+5. Run `docker-compose up --build` and go to localhost:80 to test load balancer
+6. Use `loadtest` to test your load balancer's capacity.
+`npm install -g loadtest`
+`loadtest -t 5 -c 100 --rps 100 http://localhost:80`
+This above command will create 100 clients to hit the server 100/s for 5s. It will also display performance metrics.
+
+[Configuring nginx](https://www.linode.com/docs/web-servers/nginx/how-to-configure-nginx/)
