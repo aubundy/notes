@@ -10,6 +10,7 @@ Notes on what I've been learning
   * [Testing](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/testing.md)
   * [TypeScript](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/typescript.md)
   * [SSR](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/server_side_rendering.md)
+  * [Security](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/security.md)
   * [Code Analysis](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/code_analysis.md)
   * [Docker](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/docker.md)
   * [Redis](https://github.com/aTmb405/notes/blob/master/Jr%20to%20Sr%20Developer/redis.md)
