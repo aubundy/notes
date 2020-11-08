@@ -25,3 +25,11 @@ We will be using [Kali Linux](https://www.kali.org/) - a distro made specially f
 Update Network Adapter in Settings from NAT -> Bridged Adapter. Use a USB Network Adapter. [Configuration settings](https://www.nakivo.com/blog/how-to-install-kali-linux-on-virtualbox/)
 
 [Todo after installing Kali Linux](https://www.ceos3c.com/hacking/top-things-after-installing-kali-linux/)
+
+## 5 Stage of Pen Testing
+
+1. Reconnaissance/Information Gathering
+2. Scanning
+3. Exploitation/Gaining Access
+4. Maintaining Access
+5. Covering Tracks
