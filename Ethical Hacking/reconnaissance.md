@@ -6,7 +6,7 @@
 ## Type of data
 * ip addresses
 * phone numbers
-* emails
+* emails/usernames
 * technologies
 
 ## IP Addresses
@@ -30,3 +30,25 @@ Tool used to recognize different technologies (CMS, JS libraries, servers, etc.)
 `theHarvester -d URL -b all` - sometimes play with the source to search (after '-b')
 
 Hunter.io - another option to find out the number of emails available online for a given domain
+
+## Downloading Additional Tools
+
+The tools we use might often break, become outdated, etc. Search Github for information gathering tools often.
+
+[RED_HAWK](https://github.com/Tuhinshubhra/RED_HAWK)
+[sherlock](https://github.com/sherlock-project/sherlock) - useful for scraping usernames
+
+In Desktop - `git clone https://github.com/Tuhinshubhra/RED_HAWK`
+
+`php rhawk.php`
+
+`git clone https://github.com/sherlock-project/sherlock`
+
+```
+python3 sherlock.py
+pip3 install torrequest // if a module is missing, try downloading it
+```
+
+[25 More Tools](https://securitytrails.com/blog/osint-tools)
+
+Always be on the lookout for more and better tools to use for information gathering.
