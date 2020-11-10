@@ -25,3 +25,25 @@ Use logs to get info from your system, user interaction, etc. Time to detect bre
 
 Morgan - use as a logging middleware after bodyParser
 Winston - advanced console.log
+
+## HTTPS Everywhere
+
+Use SSL/TLS Certificates on your website to use HTTPS.
+
+[Let's Encrypt](https://letsencrypt.org/)
+[Cloudflare](https://www.cloudflare.com/)
+
+## XSS + CSRF
+
+Cross-site scripting occurs when a website uses untrusted data by not using proper validation or escaping. This allows hackers to run JS in a victim's browser. They could do things like steal saved cookie information and use it to log into accounts (session hijacking). Sanitizing inputs/validating inputs prevents these attacks.
+
+Cross-site request forgery occurs when a server and client trust each other, and a hacker forges the request being made to the server. Content Security Policy headers prevent these attacks.
+
+Additional:
+* Don't use `eval()`
+* Don't use `document.write()`
+* Secure and HTTPOnly for cookies
+
+[CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
+[HTTPOnly and Secure Cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
+[More on XSS](https://hackernoon.com/cross-site-scripting-for-dummies-be30f76fad09)
