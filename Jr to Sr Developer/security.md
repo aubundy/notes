@@ -47,3 +47,24 @@ Additional:
 [CSP](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 [HTTPOnly and Secure Cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies)
 [More on XSS](https://hackernoon.com/cross-site-scripting-for-dummies-be30f76fad09)
+
+## Code Secrets
+
+### Environmental Variables
+
+Use `.env` files and the dotenv package to use API keys and passwords securely
+
+### Commit History
+
+Never commit secrets to GitHub
+
+Check commit history to see if any passwords, API keys, etc. were committed by mistake in the past. If so, update them
+
+## Secure Headers
+
+In express apps, `npm install helmet`. Helmet.js takes care of everything for us.
+
+[HTTP](https://code.tutsplus.com/tutorials/http-the-protocol-every-web-developer-must-know-part-1--net-31177)
+[HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
+[HTTP Header Fields](https://www.tutorialspoint.com/http/http_header_fields.htm)
+[Helmet Docs](https://github.com/helmetjs/helmet)
