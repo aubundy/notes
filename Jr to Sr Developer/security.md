@@ -68,3 +68,35 @@ In express apps, `npm install helmet`. Helmet.js takes care of everything for us
 [HTTP Headers](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers)
 [HTTP Header Fields](https://www.tutorialspoint.com/http/http_header_fields.htm)
 [Helmet Docs](https://github.com/helmetjs/helmet)
+
+## Access Control
+
+Place restrictions on what users are able to do in your app (authorization). Follow the principle of least privilege.
+
+Use `corsOptions` to limit the websites that can access your server.
+
+Assign admin privileges to dbs, etc.
+
+## Data Management
+
+* Always have backups
+* Limit sensitive data exposure and encrypt it
+* Use bcrypt, scrypt, Aragon2 to hash passwords
+* Use pgcrypto to encrypt specific postgres columns
+
+[More on securely storing passwords](https://rangle.io/blog/how-to-store-user-passwords-and-overcome-security-threats-in-2017/)
+
+## Don't Trust Anyone
+
+Everywhere that has a connection to an outside system has vulnerabilities.
+
+ratelimiter package helps protect against DDoS attacks.
+
+## Authentication
+
+Make sure people are who they say they are. Cookies and tokens are helpful in authenticating users.
+
+Multi-factor authentication goes a long way in providing security.
+
+[More on Security](https://www.hacksplaining.com/lessons)
+[Top 10 Security Risks 2020](https://owasp.org/www-project-top-ten/)
