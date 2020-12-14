@@ -116,6 +116,7 @@ Inside `.eslintrc.json` - (now it needs to be a .js, .yaml, or .json now)
 }
 ```
 
+[ESLint, Prettier, Husky](https://medium.com/swlh/react-js-adding-eslint-with-prettier-husky-git-hook-480ad39e65e9)
 [Helpful webpack config tool](https://createapp.dev/)
 
 ## Parcel
