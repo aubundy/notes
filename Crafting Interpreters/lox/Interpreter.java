@@ -1,25 +1,18 @@
 package lox;
 
-class Interpreter implements Expr.Visitor<Object> {
-    @Override
-    public Object visitLiteralExpr(Expr.Literal expr) {
-      return expr.value;
-    }
+import java.util.List;
 
-    @Override
-    public Object visitUnaryExpr(Expr.Unary expr) {
-      Object right = evaluate(expr.right);
-  
-      switch (expr.operator.type) {
-        case BANG:
-          return !isTruthy(right);
-        case MINUS:
-          checkNumberOperand(expr.operator, right);
-          return -(double)right;
+class Interpreter implements Expr.Visitor<Object>,
+                             Stmt.Visitor<Void> {
+    
+    void interpret(List<Stmt> statements) {
+      try {
+        for (Stmt statement : statements) {
+          execute(statement);
+        }
+      } catch (RuntimeError error) {
+        Lox.runtimeError(error);
       }
-  
-      // Unreachable.
-      return null;
     }
 
     private void checkNumberOperand(Token operator, Object operand) {
@@ -59,13 +52,51 @@ class Interpreter implements Expr.Visitor<Object> {
       return object.toString();
     }
 
+    private Object evaluate(Expr expr) {
+        return expr.accept(this);
+    }
+
+    private void execute(Stmt stmt) {
+      stmt.accept(this);
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+      evaluate(stmt.expression);
+      return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+      Object value = evaluate(stmt.expression);
+      System.out.println(stringify(value));
+      return null;
+    }
+
+    @Override
+    public Object visitLiteralExpr(Expr.Literal expr) {
+      return expr.value;
+    }
+
+    @Override
+    public Object visitUnaryExpr(Expr.Unary expr) {
+      Object right = evaluate(expr.right);
+  
+      switch (expr.operator.type) {
+        case BANG:
+          return !isTruthy(right);
+        case MINUS:
+          checkNumberOperand(expr.operator, right);
+          return -(double)right;
+      }
+  
+      // Unreachable.
+      return null;
+    }
+
     @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
       return evaluate(expr.expression);
-    }
-
-    private Object evaluate(Expr expr) {
-        return expr.accept(this);
     }
 
     @Override
@@ -111,14 +142,5 @@ class Interpreter implements Expr.Visitor<Object> {
   
       // Unreachable.
       return null;
-    }
-
-    void interpret(Expr expression) {
-      try {
-        Object value = evaluate(expression);
-        System.out.println(stringify(value));
-      } catch (RuntimeError error) {
-        Lox.runtimeError(error);
-      }
     }
 }
