@@ -145,3 +145,15 @@ Update the Lox class
     ...
     interpreter.interpret(statements);
 ```
+
+## Global Variables
+
+Now that we have statements, we can start working on state. We'll start with globals before getting to lexical scoping.
+
+1. Variable declaration - these bring new variables into the world
+
+`var beverage = "espresso";`
+
+2. Variable expression - these access the bindings created with declarations.
+
+`print beverage; // "espresso"`
