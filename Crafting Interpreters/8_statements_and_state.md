@@ -157,3 +157,54 @@ Now that we have statements, we can start working on state. We'll start with glo
 2. Variable expression - these access the bindings created with declarations.
 
 `print beverage; // "espresso"`
+
+## Variable syntax
+
+Variable declarations are statements, but they are different than normal statements. 
+
+We are not going to allow declarations inside the clauses of control flow statements (after an `if` or inside a `while`).
+
+We'll add a special rule to accommodate for this distinction.
+
+```
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | printStmt ;
+```
+
+Declaration statements go under the new declaration rule and right now, it's only variables. Functions and classes will also go here. The declaration rule falls through to statements since non-declaring statements are allowed everywhere declaration statements are allowed.
+
+Rule for declaring a variable - 
+
+`varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;`
+
+`var` is the leading keyword, followed by an identifier token and optional initializer expression.
+
+Here's a new primary expression in order to access the variable - 
+
+```
+primary        → "true" | "false" | "nil"
+               | NUMBER | STRING
+               | "(" expression ")"
+               | IDENTIFIER ;
+```
+
+Let's add a new statement tree for a variable declaration - 
+
+```
+      "Print      : Expr expression",
+      "Var        : Token name, Expr initializer"
+```
+
+And an expression node for accessing a variable - 
+
+```
+      "Unary    : Token operator, Expr right",
+      "Variable : Token name"
+```
+
+### Parsing variables
