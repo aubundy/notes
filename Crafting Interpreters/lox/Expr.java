@@ -15,7 +15,7 @@ abstract class Expr {
         // R visitSuperExpr(Super expr);
         // R visitThisExpr(This expr);
         R visitUnaryExpr(Unary expr);
-        // R visitVariableExpr(Variable expr);
+        R visitVariableExpr(Variable expr);
     }
 
     // static class Assign extends Expr {
@@ -185,18 +185,18 @@ abstract class Expr {
         final Expr right;
     }
 
-    // static class Variable extends Expr {
-    //     Variable(Token name) {
-    //         this.name = name;
-    //     }
+    static class Variable extends Expr {
+        Variable(Token name) {
+            this.name = name;
+        }
     
-    //     @Override
-    //     <R> R accept(Visitor<R> visitor) {
-    //         return visitor.visitVariableExpr(this);
-    //     }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableExpr(this);
+        }
     
-    //     final Token name;
-    // }
+        final Token name;
+    }
     
     abstract <R> R accept(Visitor<R> visitor);
   }
