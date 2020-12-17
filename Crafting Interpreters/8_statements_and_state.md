@@ -208,3 +208,52 @@ And an expression node for accessing a variable -
 ```
 
 ### Parsing variables
+
+We need to shift around some code to make room for the new declaration rule in the grammar. The top level of a program is now a list of declarations.
+
+In `parser.java`, `parse()` - 
+
+`statements.add(declaration());`
+
+```
+  private Stmt declaration() {
+    try {
+      if (match(TokenType.VAR)) return varDeclaration();
+
+      return statement();
+    } catch (ParseError error) {
+      synchronize();
+      return null;
+    }
+  }
+```
+
+The `declaration()` method is the method we call repeatedly when parsing a series of statements in a block or a script. So we'll synchronize here when the parser goes into panic mode.
+
+```
+  private Stmt varDeclaration() {
+    Token name = consume(IDENTIFIER, "Expect variable name.");
+
+    Expr initializer = null;
+    if (match(EQUAL)) {
+      initializer = expression();
+    }
+
+    consume(SEMICOLON, "Expect ';' after variable declaration.");
+    return new Stmt.Var(name, initializer);
+  }
+```
+
+The recursive descent follows the grammar rule, so it next requires and consumes an identifier token for the variable name. If it sees a = token next, it knows it's an expression and parses it. 
+
+In `primary()` - 
+
+```
+    if (match(IDENTIFIER)) {
+      return new Expr.Variable(previous());
+    }
+```
+
+This gives us a working front end for declaring and using variables. Now we just need to feed it into the interpreter, but we need to talk about where variables live in memory first.
+
+## Environments
