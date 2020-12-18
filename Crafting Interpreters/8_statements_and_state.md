@@ -2,6 +2,8 @@
 
 We still don't have a way to bind a name to some data or function. You can't compose software without a way to refer to the smaller pieces to build with.
 
+[Interpreter's Brain](https://craftinginterpreters.com/image/statements-and-state/brain.png)
+
 Our interpreter needs internal state in order to support bindings. State and statements go hand in hand. Statements are useful because they produce side effects. It might be producing user-visible output or modifying some state in the interpreter to be detected later. We'll do both of these here. We'll define statements that produce output (`print`) and create state (`var`). We'll add expressions to access and assign to variables, add blocks, and add local scope.
 
 ## Statements
@@ -257,3 +259,70 @@ In `primary()` -
 This gives us a working front end for declaring and using variables. Now we just need to feed it into the interpreter, but we need to talk about where variables live in memory first.
 
 ## Environments
+
+The bindings that associate variables to values need to be stored somewhere. Starting with Lisp parentheses, this data structure has been called an environment.
+
+[Environment](https://craftinginterpreters.com/image/statements-and-state/environment.png)
+
+We'll implement this in Java using an object/dictionary/hashmap/etc., variable names are keys and values are values.
+
+Create a new Environment class - 
+
+```
+package com.craftinginterpreters.lox;
+
+import java.util.HashMap;
+import java.util.Map;
+
+class Environment {
+  private final Map<String, Object> values = new HashMap<>();
+}
+```
+
+The Map of the bindings stores strings, not tokens. Tokens represent units of code at a specific place in the source text, but when looking up variables, all identifier tokens with the same name should refer to the same variable (ignoring scope for now). Using strings enforces this.
+
+Variable definition binds a new name to a value.
+
+```
+  Object get(Token name) {
+    if (values.containsKey(name.lexeme)) {
+      return values.get(name.lexeme);
+    }
+
+    throw new RuntimeError(name,
+        "Undefined variable '" + name.lexeme + "'.");
+  }
+
+  void define(String name, Object value) {
+    values.put(name, value);
+  }
+```
+
+We don't check if a variable has already been added to the map, instead, the variable gets redefined. This is similar behavior to Scheme. If the variable isn't found, a runtime error is thrown.
+
+### Interpreting global variables
+
+The Interpreter class gets an instance of the new Environment class - 
+
+`private Environment environment = new Environment();`
+
+We store it as a field directly in Interpreter so that the variables stay in memory as long as the interpreter is still running.
+
+With two new syntax trees, we need to new visit methods - 
+
+```
+  @Override
+  public Void visitVarStmt(Stmt.Var stmt) {
+    Object value = null;
+    if (stmt.initializer != null) {
+      value = evaluate(stmt.initializer);
+    }
+
+    environment.define(stmt.name.lexeme, value);
+    return null;
+  }
+```
+
+If the variable has an initializer, we evaluate it. If not, we will set it to `nil`.
+
+With variable expressions, we simply forward to the environment to do the heavy lifting to make sure the variable is defined.
