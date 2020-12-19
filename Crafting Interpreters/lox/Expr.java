@@ -4,7 +4,7 @@ package lox;
 
 abstract class Expr { 
     interface Visitor<R> {
-        // R visitAssignExpr(Assign expr);
+        R visitAssignExpr(Assign expr);
         R visitBinaryExpr(Binary expr);
         // R visitCallExpr(Call expr);
         // R visitGetExpr(Get expr);
@@ -18,20 +18,20 @@ abstract class Expr {
         R visitVariableExpr(Variable expr);
     }
 
-    // static class Assign extends Expr {
-    //     Assign(Token name, Expr value) {
-    //         this.name = name;
-    //         this.value = value;
-    //     }
+    static class Assign extends Expr {
+        Assign(Token name, Expr value) {
+            this.name = name;
+            this.value = value;
+        }
     
-    //     @Override
-    //     <R> R accept(Visitor<R> visitor) {
-    //         return visitor.visitAssignExpr(this);
-    //     }
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitAssignExpr(this);
+        }
     
-    //     final Token name;
-    //     final Expr value;
-    // }
+        final Token name;
+        final Expr value;
+    }
 
     static class Binary extends Expr {
         Binary(Expr left, Token operator, Expr right) {
