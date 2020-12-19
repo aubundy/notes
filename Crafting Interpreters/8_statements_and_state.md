@@ -326,3 +326,68 @@ With two new syntax trees, we need to new visit methods -
 If the variable has an initializer, we evaluate it. If not, we will set it to `nil`.
 
 With variable expressions, we simply forward to the environment to do the heavy lifting to make sure the variable is defined.
+
+## Assignment
+
+Some languages have variables, but don't let you reassign/mutate them (Haskell, Rust requires a modifier). Lox will allow reassignment. We just need to add explicit assignment notation.
+
+### Assignment syntax
+
+Like most C-derived languages, assignment is an expression and not a statement. The rule will slots between expression and equality.
+
+```
+expression     → assignment ;
+assignment     → IDENTIFIER "=" assignment
+               | equality ;
+```
+
+`"Assign   : Token name, Expr value",`
+
+We add the new syntax tree node. It has a token for the variable being assigned to, and an expression for the new value.
+
+```
+  private Expr expression() {
+    return assignment();
+  }
+```
+
+Match the new parser's rule.
+
+A single token lookahead recursive descent parser can't see far enough to tell that it's parsing an assignmet until after it has gone through the left-hand side and stumbled onto the =.
+
+All of the expressions we've seen so far that produce values are "r-values". An "l-value" 'evaluates' to a storage location that you can assign into.
+
+```
+var a = "before"; // r
+a = "value"; // l
+```
+
+We want the syntax tree to reflect that an l-value isn't evaluated like a normal expression. That's why Expr.Assign has a Token, not Expr for the left-hand side.
+
+Since we only have a single token of lookahead, we need a little trick - 
+
+```
+  private Expr assignment() {
+    Expr expr = equality();
+
+    if (match(EQUAL)) {
+      Token equals = previous();
+      Expr value = assignment();
+
+      if (expr instanceof Expr.Variable) {
+        Token name = ((Expr.Variable)expr).name;
+        return new Expr.Assign(name, value);
+      }
+
+      error(equals, "Invalid assignment target."); 
+    }
+
+    return expr;
+  }
+```
+
+Since this is similar to parsing other binary operators like +, we parse the left-hand side, which can be any expression of higher precedence. If we find a =, we parse the right-hand side and then wrap it all up in an assignment expression tree node.
+
+We don't loop to build up a sequence of the same operator like we did for binary operators. Since assignment is right-associative, we instead recursively call `assignment()` to parse the right-hand side. 
+
+The trick is right before we create the assignment expression node, we look at the left-hand side expression and figure out what kind of assignment target it is. We convert the r-value expression node into an l-value representation. This works because every valid assignment target happens to also be valid syntax as a normal expression.
