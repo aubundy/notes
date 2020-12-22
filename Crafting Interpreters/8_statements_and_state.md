@@ -604,4 +604,10 @@ We create an empty list and then parse statements and add them to the list until
 
 We then add another visit method to Interpreter and to execute a block, we create a new environment for the block's scope.
 
-The new method executes a list of statements in the context of a given environment.
+The new method executes a list of statements in the context of a given environment. Until now, the environment field in Interpreter always pointed to the global environment. Now, it represents the current environment.
+
+To execute code within a given scope, this method updates the interpreter's environment field, visits all of the statements, and then restores the previous value. As is always good practice in Java, it restores the previous environment using a finally clause. This way it gets restored even if an exeption is thrown.
+
+It would be more "elegant" to pass the environment as a parameter, but this is simpler.
+
+Now our interpreter can remember things!
