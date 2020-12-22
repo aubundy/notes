@@ -391,3 +391,217 @@ Since this is similar to parsing other binary operators like +, we parse the lef
 We don't loop to build up a sequence of the same operator like we did for binary operators. Since assignment is right-associative, we instead recursively call `assignment()` to parse the right-hand side. 
 
 The trick is right before we create the assignment expression node, we look at the left-hand side expression and figure out what kind of assignment target it is. We convert the r-value expression node into an l-value representation. This works because every valid assignment target happens to also be valid syntax as a normal expression.
+
+### Assignment semantics
+
+Since we have a new syntax tree node, our interpreter gets a new visit method - 
+
+```
+  @Override
+  public Object visitAssignExpr(Expr.Assign expr) {
+    Object value = evaluate(expr.value);
+    environment.assign(expr.name, value);
+    return value;
+  }
+```
+
+It's similar to variable declaration; it evaluates the right-hand side to get the value, then stores it in the named variable. It then calls a new method on Environment - 
+
+```
+  void assign(Token name, Object value) {
+    if (values.containsKey(name.lexeme)) {
+      values.put(name.lexeme, value);
+      return;
+    }
+
+    throw new RuntimeError(name,
+        "Undefined variable '" + name.lexeme + "'.");
+  }
+```
+
+The main difference between assignment and definition is that assignment is not allowed to create a new variable. A runtime error is thrown if the key doesn't already exist in the evironment's variable map.
+
+The `visit()` method then finally returns the assigned value.
+
+```
+var a = 1;
+print a = 2; // "2".
+```
+
+Our interpreter can now create, read, and modify variables. But now we need to create local variables, not just global variables. 
+
+## Scope
+
+Scope defines a region where a name maps to a certain entity. Multiple scopes enable the same name to refer to different things in different contexts.
+
+Lexical scope is a specific style of scoping where the text of the program itself shows where a scope begins and ends. Lox variables, like most modern languages, are lexically scoped.
+
+```
+{
+  var a = "first";
+  print a; // "first".
+}
+
+{
+  var a = "second";
+  print a; // "second".
+}
+```
+
+[Lexical Block Scope](https://craftinginterpreters.com/image/statements-and-state/blocks.png)
+
+Methods and fields on objects are dynamically scoped in Lox - 
+
+```
+class Saxophone {
+  play() {
+    print "Careless Whisper";
+  }
+}
+
+class GolfClub {
+  play() {
+    print "Fore!";
+  }
+}
+
+fun playIt(thing) {
+  thing.play();
+}
+```
+
+`playIt()` doesn't know what `thing.play()` will return until it is run.
+
+### Nesting and shadowing
+
+A first cut at implementing block scope might work like this:
+
+1. As we visit each statement inside the block, keep track of any variables declared.
+
+2. After the last statement is executed, tell the enironment to delete all of those variables.
+
+That would work for the previous example, but, remember, one motivation for local scope is encapsulation - code blocks from corner of the program shouldn't interfere with some other one.
+
+```
+// How loud?
+var volume = 11;
+
+// Silence.
+volume = 0;
+
+// Calculate size of 3x4x5 cuboid.
+{
+  var volume = 3 * 4 * 5;
+  print volume;
+}
+```
+
+We should remove any variables declared insdie the block, but if there is a variable with the same name declared outside of the block, that's a different variable.
+
+When a local variable has the same name as a variable in an enclosing scope, it shadows the outer one. Code inside the block can't see it any more, but it's still there.
+
+When we enter a new block scope, we need to preserve variables defined in out scopes so they are still around when we exit the inner block. We do that by defining a fresh environment for each block containing only the variables defined in that scope. When we exit the block, we discard its environment and restore the previous one.
+
+We also need to handle enclosing variables that are not shadowed -
+
+```
+var global = "outside";
+{
+  var local = "inside";
+  print global + local;
+}
+```
+
+In the example above, the interpreter must search not only the current innermost environment, but also any enclosing ones.
+
+We can do this by chaining the environments together. Each environment has a reference to the environment of the immediately enclosing scope. When we look up a variable, we walk that chain from innermost out until we find the variable.
+
+[Chained environments](https://craftinginterpreters.com/image/statements-and-state/chaining.png)
+
+[Cactus stack](https://craftinginterpreters.com/image/statements-and-state/cactus.png)
+
+Before we add block syntax to the grammar, we'll beef up the Environment class with support for this nesting.
+
+```
+  Environment() {
+    enclosing = null;
+  }
+
+  Environment(Environment enclosing) {
+    this.enclosing = enclosing;
+  }
+```
+
+The no-argument constructor is for the global scope's environment, which ends the chain. The other constructor creates a new local scope nested inside the given outer one.
+
+We don't have to touch the `define()` method - a new variable is always declared in the current innermost scope. But variable lookup and assignment work with existing variables and they need to walk the chain to find them.
+
+`if (enclosing != null) return enclosing.get(name);`
+
+If the variable isn't found in this environment, we simply try the enclosing one recursively. If we can't find one, we report an error as before. And assignment works the same way.
+
+```
+    if (enclosing != null) {
+      enclosing.assign(name, value);
+      return;
+    }
+```
+
+### Block syntax and semantics
+
+We're ready to add blocks to the language now that Environments nest.
+
+```
+statement      → exprStmt
+               | printStmt
+               | block ;
+
+block          → "{" declaration* "}" ;
+```
+
+Blocks are (possibly empty) series of statements or declarations surrounded by curly braces. Blocks are also statements themselves.
+
+`    if (match(LEFT_BRACE)) return new Stmt.Block(block());`
+
+We detect the beginning of a block by its leading token. All the real work then happens here - 
+
+```
+  private List<Stmt> block() {
+    List<Stmt> statements = new ArrayList<>();
+
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
+      statements.add(declaration());
+    }
+
+    consume(RIGHT_BRACE, "Expect '}' after block.");
+    return statements;
+  }
+```
+
+We create an empty list and then parse statements and add them to the list until we reach the end of the block. We also check `isAtEnd()`. We have to be careful to avoid infinite loops, so we need to handle a block that doesn't end with }.
+
+```
+  void executeBlock(List<Stmt> statements,
+                    Environment environment) {
+    Environment previous = this.environment;
+    try {
+      this.environment = environment;
+
+      for (Stmt statement : statements) {
+        execute(statement);
+      }
+    } finally {
+      this.environment = previous;
+    }
+  }
+
+  @Override
+  public Void visitBlockStmt(Stmt.Block stmt) {
+    executeBlock(stmt.statements, new Environment(environment));
+    return null;
+  }
+```
+
+We then add another visit method to Interpreter and to execute a block, we create a new environment for the block's scope.
+
+The new method executes a list of statements in the context of a given environment.
