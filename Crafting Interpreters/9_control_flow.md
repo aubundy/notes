@@ -162,3 +162,154 @@ We don't literally return `true` or `false`, but a value with proper truthiness.
 print "hi" or 2; // "hi".
 print nil or "yes"; // "yes".
 ```
+
+## While Loops
+
+The grammar for while loops is the same as in C - 
+
+```
+statement      → exprStmt
+               | ifStmt
+               | printStmt
+               | whileStmt
+               | block ;
+
+whileStmt      → "while" "(" expression ")" statement ;
+```
+
+```
+      "Var        : Token name, Expr initializer",
+      "While      : Expr condition, Stmt body"
+```
+
+The condition is an expression and the body is a statement.
+
+In the parser, we follow the same process we used for if statements.
+
+`    if (match(WHILE)) return whileStatement();`
+
+```
+  private Stmt whileStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'while'.");
+    Expr condition = expression();
+    consume(RIGHT_PAREN, "Expect ')' after condition.");
+    Stmt body = statement();
+
+    return new Stmt.While(condition, body);
+  }
+```
+
+```
+  @Override
+  public Void visitWhileStmt(Stmt.While stmt) {
+    while (isTruthy(evaluate(stmt.condition))) {
+      execute(stmt.body);
+    }
+    return null;
+  }
+```
+
+The method isn't complex, but this makes Lox much more powerful. Our program's running time is no longer bound by the length of the source code.
+
+## For Loops
+
+We will just be building an old school for loop.
+
+```
+statement      → exprStmt
+               | forStmt
+               | ifStmt
+               | printStmt
+               | whileStmt
+               | block ;
+
+forStmt        → "for" "(" ( varDecl | exprStmt | ";" )
+                 expression? ";"
+                 expression? ")" statement ;
+```
+
+The for loop has three clauses separated by semicolons:
+
+1. Initializer - executed once, before anything else. It's usually an expression, but it can also be variable declaration.
+
+2. Condition - this controls when to exit the loop. It is evaluated once at the beginning of each iteration, including the first.
+
+3. Increment - This does some work at the end of each loop iteration. No result is saved, so it must be a side effect. It usually increments a variable
+
+### Desugaring
+
+For loops are technically necessary. The same functionality is possible with just while loops and putting the initializer and increment where they need to be.
+
+```
+{
+  var i = 0;
+  while (i < 10) {
+    print i;
+    i = i + 1;
+  }
+}
+```
+
+But for loops make common code patterns more pleasant to write. This is referred to as syntactic sugar.
+
+[Sugar](https://craftinginterpreters.com/image/control-flow/sugar.png)
+
+Desugaring involves a process where the front end takes code using syntax sugar and translates it to a more primitive form that the back end already knows how to execute.
+
+We while desugar for loops to the while loops that our interpreter already knows how to handle.
+
+`    if (match(FOR)) return forStatement();`
+
+```
+  private Stmt forStatement() {
+    consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+    Stmt initializer;
+    if (match(SEMICOLON)) {
+      initializer = null;
+    } else if (match(VAR)) {
+      initializer = varDeclaration();
+    } else {
+      initializer = expressionStatement();
+    }
+
+    Expr condition = null;
+    if (!check(SEMICOLON)) {
+      condition = expression();
+    }
+    consume(SEMICOLON, "Expect ';' after loop condition.");
+
+    Expr increment = null;
+    if (!check(RIGHT_PAREN)) {
+      increment = expression();
+    }
+    consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+    Stmt body = statement();
+
+    if (increment != null) {
+      body = new Stmt.Block(
+          Arrays.asList(
+              body,
+              new Stmt.Expression(increment)));
+    }
+
+    if (condition == null) condition = new Expr.Literal(true);
+    body = new Stmt.While(condition, body);
+
+    if (initializer != null) {
+      body = new Stmt.Block(Arrays.asList(initializer, body));
+    }
+
+    return body;
+  }
+```
+
+If the token following the ( is a semicolon, the initializer has been omitted. Otherwise, we check for a var keyword to see if it's a variable declaration. If not, it must be an expression.
+
+Then in the condition, we look for a semicolon, if not, it's an expression.
+
+Finally, we look for the increment. If there is one, it executes after the body in each iteration of the loop. 
+
+We do that by replacing the body with a little block that contains the original body followed by an expression statement that evaluates the increment. Then we build the loop using a primitive while loop. If there's an initializer, it runs once before the entire loop. Then it happens again, replacing the whole statement with a block that runs the initializer and then executes the loop.
+
+Now Lox is powerful enough to entertain us.
