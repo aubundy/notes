@@ -8,7 +8,7 @@ In the early 1900s, mathematicians stumbled into a series of paradoxes that led 
 
 Alan Turing and Alonzo Church devised a precise answer to the last question - a definition of what kinds of functions are computable. Turing produced a Turing machine and Church lambda calculus.
 
-[A-machine](https://craftinginterpreters.com/image/control-flow/turing-machine.png)
+![A-machine](https://craftinginterpreters.com/image/control-flow/turing-machine.png)
 
 Any programming language with some minimal level of expressiveness is powerful enough to compute any computable function.
 
@@ -63,7 +63,7 @@ The parse recognizes an if statement by the leading if keyword -
   }
 ```
 
-[Danling Else Problem](https://craftinginterpreters.com/image/control-flow/dangling-else.png)
+![Danling Else Problem](https://craftinginterpreters.com/image/control-flow/dangling-else.png)
 
 `if (first) if (second) whenTrue(); else whenFalse();`
 
@@ -252,7 +252,7 @@ For loops are technically necessary. The same functionality is possible with jus
 
 But for loops make common code patterns more pleasant to write. This is referred to as syntactic sugar.
 
-[Sugar](https://craftinginterpreters.com/image/control-flow/sugar.png)
+![Sugar](https://craftinginterpreters.com/image/control-flow/sugar.png)
 
 Desugaring involves a process where the front end takes code using syntax sugar and translates it to a more primitive form that the back end already knows how to execute.
 
