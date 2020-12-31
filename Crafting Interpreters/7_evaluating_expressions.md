@@ -1,6 +1,6 @@
 # Evaluating Expressions
 
-[Decrepit Victorian Mansion](http://craftinginterpreters.com/image/evaluating-expressions/lightning.png)
+![Decrepit Victorian Mansion](http://craftinginterpreters.com/image/evaluating-expressions/lightning.png)
 
 There are lots of ways to tell the computer what to do with the user's commands. You can compile it to machine code, translate it into another high-level language, or reduce it to some bytecode format for a virtual machine to run. The shortest path is to just execute the source code itself, which is what we will do.
 
@@ -161,7 +161,7 @@ Syntax and static errors are reported before any code is executed. Runtime error
 
 We want users to understand a Lox runtime error has occured, not merely copy Java's runtime errors.
 
-[Negating a Muffin](https://craftinginterpreters.com/image/evaluating-expressions/muffin.png)
+![Negating a Muffin](https://craftinginterpreters.com/image/evaluating-expressions/muffin.png)
 
 ### Detecting runtime errors
 
@@ -322,4 +322,4 @@ Then, we replace the previous syntax tree printer in `run()` with:
 
 We can now scan, parse, and execute our language.
 
-[Bare bones interpreter](https://craftinginterpreters.com/image/evaluating-expressions/skeleton.png)
+![Bare bones interpreter](https://craftinginterpreters.com/image/evaluating-expressions/skeleton.png)
