@@ -2,7 +2,7 @@
 
 We still don't have a way to bind a name to some data or function. You can't compose software without a way to refer to the smaller pieces to build with.
 
-[Interpreter's Brain](https://craftinginterpreters.com/image/statements-and-state/brain.png)
+![Interpreter's Brain](https://craftinginterpreters.com/image/statements-and-state/brain.png)
 
 Our interpreter needs internal state in order to support bindings. State and statements go hand in hand. Statements are useful because they produce side effects. It might be producing user-visible output or modifying some state in the interpreter to be detected later. We'll do both of these here. We'll define statements that produce output (`print`) and create state (`var`). We'll add expressions to access and assign to variables, add blocks, and add local scope.
 
@@ -262,7 +262,7 @@ This gives us a working front end for declaring and using variables. Now we just
 
 The bindings that associate variables to values need to be stored somewhere. Starting with Lisp parentheses, this data structure has been called an environment.
 
-[Environment](https://craftinginterpreters.com/image/statements-and-state/environment.png)
+![Environment](https://craftinginterpreters.com/image/statements-and-state/environment.png)
 
 We'll implement this in Java using an object/dictionary/hashmap/etc., variable names are keys and values are values.
 
@@ -448,7 +448,7 @@ Lexical scope is a specific style of scoping where the text of the program itsel
 }
 ```
 
-[Lexical Block Scope](https://craftinginterpreters.com/image/statements-and-state/blocks.png)
+![Lexical Block Scope](https://craftinginterpreters.com/image/statements-and-state/blocks.png)
 
 Methods and fields on objects are dynamically scoped in Lox - 
 
@@ -516,9 +516,9 @@ In the example above, the interpreter must search not only the current innermost
 
 We can do this by chaining the environments together. Each environment has a reference to the environment of the immediately enclosing scope. When we look up a variable, we walk that chain from innermost out until we find the variable.
 
-[Chained environments](https://craftinginterpreters.com/image/statements-and-state/chaining.png)
+![Chained environments](https://craftinginterpreters.com/image/statements-and-state/chaining.png)
 
-[Cactus stack](https://craftinginterpreters.com/image/statements-and-state/cactus.png)
+![Cactus stack](https://craftinginterpreters.com/image/statements-and-state/cactus.png)
 
 Before we add block syntax to the grammar, we'll beef up the Environment class with support for this nesting.
 
