@@ -142,7 +142,7 @@ Add a `match` and `check` method to end the while loop inside the `equality` met
 
 So if we are inside the `while` loop in the `equality()` function, then we know we've run across `!=` or `==`. It grabs that operator with `previous()` then calls `comparison()` again to parse the right-hand operand. It then combines the operator and two operands into a new `Expr.Binary` syntax tree node, and then loops around, storing the expression back in the same `expr` variable.
 
-[Parsing a == b == c == d == e](http://craftinginterpreters.com/image/parsing-expressions/sequence.png)
+![Parsing a == b == c == d == e](http://craftinginterpreters.com/image/parsing-expressions/sequence.png)
 
 The parser falls out of the loop once it hits a token that's not an equality operator. When that happens, it returns the expression. If there's never an equality operator, `comparison()` is returned.
 
