@@ -177,3 +177,98 @@ When make is run, all is executed, but normalize is first because it’s a depen
 To run:
 
 `make clean && make`
+
+### Organization
+
+Also with Make, we can organize the different SQL commands into different files. Let’s divide our commands into
+
+`import.sql` - creates import schema and loads CSV file
+
+`normalize.sql` - split import table to lookups, etc. (next section)
+
+## Normalization
+
+The goal of normalization is to reduce repetition and therefore, disk space. It also sometimes speeds things up (comparing integers vs strings)
+
+Our CSV file has the following columns:
+
+* start_time_utc
+• duration
+• date
+• team
+• spass_type
+• target
+• request_name
+• library_definition
+• title
+• description
+
+We could create the following lookup tables out of these to avoid string repetition. SPASS evidently means Science Planning Attitude Spread Sheet.
+
+* teams
+• spass_types
+• targets
+• requests
+• library_definitions
+
+To build a lookup table, we get the distinct values, create a new table from this data, and add a primary key for use with a foreign key constraint. 
+
+These lookup tables then refer back to a source/fact table. This structure works well with historical data, and this will form a star schema. 
+
+## Importing Events
+We’ll build a fact table for events that’ll go in our public schema. 
+
+```
+create table events(
+  id serial primary key,
+  time_stamp timestamptz not
+  null, title varchar(500),
+  description text,
+  event_type_id int,
+  spass_type_id int,
+  target_id int,
+  team_id int,
+  request_id int
+);
+```
+
+
+Only the time_stamp field can’t be empty. The lookup ids will be empty for now. 
+
+### Dates
+
+Importing dates will always be difficult. Formatting always differs. A lot of bugs have occurred due to leap year calculation issues. Postgres can fix a lot of date formatting issues. 
+
+**timestamptz** - time stamp with a time zone. Postgres will store dates as UTC, but when the data is retrieved, it will convert it to have a time zone based on the server’s config file. If there’s no time zone info, Postgres assumes a local time. 
+
+We can cast any date and time with **at time zone**
+
+```
+insert into events(
+  time_stamp,
+  title,
+  description
+)
+select
+import.master_plan.date::timestamptz at time zone ‘UTC’,
+import.master_plan.title,
+import.master_plan.description
+from import.master_plan;
+```
+
+## Lookup Tables
+
+**distinct** helps pull only distinct values from a query. **into** sends the query results to a new table. 
+
+```
+drop table if exists [LOOKUP TABLE];
+select distinct(THING)
+as description
+into [LOOKUP TABLE]
+from import.master_plan;
+
+alter table [LOOKUP TABLE]
+add id serial primary key;
+```
+
+Now we just need to relate the lookup table back to facts table.
