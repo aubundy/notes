@@ -250,9 +250,9 @@ insert into events(
   description
 )
 select
-import.master_plan.date::timestamptz at time zone ‘UTC’,
-import.master_plan.title,
-import.master_plan.description
+  import.master_plan.date::timestamptz at time zone ‘UTC’,
+  import.master_plan.title,
+  import.master_plan.description
 from import.master_plan;
 ```
 
@@ -263,8 +263,8 @@ from import.master_plan;
 ```
 drop table if exists [LOOKUP TABLE];
 select distinct(THING)
-as description
-into [LOOKUP TABLE]
+  as description
+  into [LOOKUP TABLE]
 from import.master_plan;
 
 alter table [LOOKUP TABLE]
@@ -272,3 +272,191 @@ add id serial primary key;
 ```
 
 Now we just need to relate the lookup table back to facts table.
+
+Joining two tables on text fields is very slow, but sometimes it's unavoidable. In our case, we can insert events from the import table and set the ids, all in one shot. This reduces 6 operations into 1. And we can update our foreign keys in our create table statement.
+
+```
+drop table if exists events;
+create table events(
+  id serial primary key,
+  time_stamp timestamptz not null,
+  title varchar(500),
+  description text,
+  event_type_id int references event_types(id),
+  target_id int references targets(id),
+  team_id int references teams(id),
+  request_id int references requests(id),
+  spass_type_id int references spass_types(id)
+);
+
+insert into events(
+  time_stamp,
+  title,
+  description,
+  event_type_id,
+  target_id,
+  team_id,
+  request_id,
+  spass_type_id
+)
+select
+  import.master_plan.start_time_utc::timestamp, import.master_plan.title, import.master_plan.description, event_types.id as event_type_id,
+  targets.id as target_id, teams.id as team_id, requests.id as request_id, spass_types.id as spass_type_id
+from import.master_plan 
+left join event_types
+  on event_types.description
+  = import.master_plan.library_definition 
+left join targets
+  on targets.description
+  = import.master_plan.target 
+left join teams
+  on teams.description
+  = import.master_plan.team
+left join requests
+  on requests.description
+  = import.master_plan.request_name
+left join spass_types
+  on spass_types.description
+  = import.master_plan.spass_type;
+```
+
+This doesn't import all of our data, though. The inner joins limits our selection, we need to use left joins (already replaced).
+
+* inner joins only return results where there are matching rows in the joined table
+* left join returns all the records in the "from" table, and fills out missing rows in the join table with nulls
+* right join returns all the records in the join table, and pads in missing data with nulls
+* full outer join returns all records and fills in all missing data with null
+* cross join returns every row in the from table crossed with every row in the joining table. This is rarely used.
+
+Put the CSV file into the data directory and two SQL files into a scripts directory.
+
+import.sql. This drops and creates the import schema and creates the master_plan table - 
+```
+drop table if exists events cascade;
+drop table if exists teams cascade;
+drop table if exists targets cascade;
+drop table if exists spass_types cascade;
+drop table if exists requests cascade;
+drop table if exists event_types cascade;
+
+drop table if exists master_plan;
+create table master_plan(
+  start_time_utc text,
+  duration text,
+  date text,
+  team text,
+  spass_type text,
+  target text,
+  request_name text,
+  library_definition text,
+  title text,
+  description text
+);
+```
+
+normalize.sql. This creates the lookups, creates the events table, and inserts everything into the events table - 
+```
+-- TEAM
+drop table if exists teams;
+select distinct(team)
+as description
+into teams
+from import.master_plan;
+
+alter table teams
+add id serial primary key;
+
+-- SPASS TYPES
+drop table if exists spass_types;
+select distinct(spass_type)
+as description
+into spass_types
+from import.master_plan;
+
+alter table spass_types
+add id serial primary key;
+
+-- TARGET
+drop table if exists targets;
+select distinct(target)
+as description
+into targets
+from import.master_plan;
+
+alter table targets
+add id serial primary key;
+
+-- EVENT TYPES
+drop table if exists event_types;
+select distinct(library_definition)
+as description
+into event_types
+from import.master_plan;
+
+alter table event_types
+add id serial primary key;
+
+--REQUESTS
+drop table if exists requests;
+select distinct(request_name)
+as description
+into requests
+from import.master_plan;
+
+alter table requests
+add id serial primary key;
+
+create table events(
+  id serial primary key,
+  time_stamp timestamp not null,
+  title varchar(500),
+  description text,
+  event_type_id int references event_types(id),
+  target_id int references targets(id),
+  team_id int references teams(id),
+  request_id int references requests(id),
+  spass_type_id int references spass_types(id)
+);
+
+insert into events(
+  time_stamp, 
+  title, 
+  description, 
+  event_type_id, 
+  target_id, 
+  team_id, 
+  request_id,
+	spass_type_id
+)	
+select 
+  import.master_plan.start_time_utc::timestamp, 
+  import.master_plan.title, 
+  import.master_plan.description,
+  event_types.id as event_type_id,
+  targets.id as target_id,
+  teams.id as team_id,
+  requests.id as request_id,
+  spass_types.id as spass_type_id
+from import.master_plan
+left join event_types 
+  on event_types.description 
+  = import.master_plan.library_definition
+left join targets 
+  on targets.description 
+  = import.master_plan.target
+left join teams 
+  on teams.description 
+  = import.master_plan.team
+left join requests 
+  on requests.description 
+  = import.master_plan.request_name
+left join spass_types 
+  on spass_types.description 
+  = import.master_plan.spass_type;
+```
+
+Postgres cannot drop a table if other tables depend on it. Adding **cascade** to a drop statement will drop all of the dependent objects as well.
+
+Instead of having the events table creation after the lookup tables are created, we could change the Makefile to be more granular.
+
+## Flyby Queries
