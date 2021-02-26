@@ -1,8 +1,8 @@
-DB=enceladus
+DB= enceladus
 BUILD= build.sql
 SCRIPTS= scripts
-CSV= data/master_plan.csv
-MASTER=$(SCRIPTS)/import.sql
+CSV= '${CURDIR}/data/master_plan.csv'
+MASTER= $(SCRIPTS)/import.sql
 NORMALIZE = $(SCRIPTS)/normalize.sql 
 
 all: normalize
