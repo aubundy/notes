@@ -460,3 +460,172 @@ Postgres cannot drop a table if other tables depend on it. Adding **cascade** to
 Instead of having the events table creation after the lookup tables are created, we could change the Makefile to be more granular.
 
 ## Flyby Queries
+
+Find the precise flyby times for Enceladus.
+
+Look through returned titles to find info on enceladus -
+
+```
+select targets.description as target,
+time_stamp,
+title
+from events
+inner join targets on target_id=targets.id;
+```
+
+Try looking for the term "flyby" or "fly by" in events, with no case sensitivity (use \x for expanded view) -
+
+```
+select targets.description as target,
+event_types.description as event,
+time_stamp,
+time_stamp::date as date,
+title
+from events
+left join targets on target_id=targets.id
+left join event_types on event_type_id=event_
+types.id
+where title ilike '%flyby%'
+or title ilike '%fly by%';
+```
+
+Use regex to target Titan flybys -
+
+```
+select targets.description as target,
+time_stamp,
+title
+from events
+inner join targets on target_id=targets.id
+where title ~* '^T\d.*? flyby';
+```
+
+The first Enceladus flyby was Feb 17, 2005, but it's not appearing in the data. 
+
+Target a specific date -
+
+```
+select target, title, date
+from import.master_plan
+where start_time_utc::date = '2005-02-17'
+order by start_time_utc::date;
+```
+
+The flyby is there, but labeled incorrectly. Read about sargeable vs non-sargeable queries, full-text indexing, and views (and materialized view).
+
+### The first Encelauds flyby
+
+```
+select
+targets.description as target,
+events.time_stamp,
+event_types.description as event
+from events
+inner join event_types on event_types.id = events.
+event_type_id
+inner join targets on targets.id = events.target_id
+where events.time_stamp::date='2005-02-17'
+and targets.id = 28
+order by events.time_stamp;
+```
+
+Found event type: Enceladus closest approach observation
+
+Postgres searching through numbers a lot faster than strings. Always try to leverage key values.
+
+### Sargeable vs. non-sargeable queries
+
+"Search ARGument ABLE"
+
+Sometimes you can't help searching for a string, so just make sure to use some kind of optimization. Sargeable queries can be optimized.
+
+```
+select *
+from events
+where description like 'closest%';
+```
+
+There's no wildcard before the term closest, so the query planner would be able to optimize this search if there was an index on the `description` field. But since there isn't, this is a non-sargeable query, and Postgres had to search every row in the table through a string comparison (sequential scan).
+
+### Using views for easier querying
+
+```
+drop view if exists enceladus_events;
+create view enceladus_events as
+select
+events.id,
+events.title,
+events.description,
+events.time_stamp,
+events.time_stamp::date as date,
+event_types.description as event
+from events
+inner join event_types
+on event_types.id = events.event_type_id
+where target_id = 28
+order by time_stamp;
+```
+
+We removed the targets join and the resulting info because the view is already labeled with the data the query is returning.
+
+```
+select * from enceladus_events
+where date = '2005-03-09';
+```
+
+Postgres can output data to html.
+
+```
+\H
+\o feb_2005_flyby.html
+SELECT QUERY...
+```
+
+### Full-text queries
+
+Add full-text search to our view - 
+
+```
+drop view if exists enceladus_events;
+create view enceladus_events as
+select
+events.id,
+events.title,
+events.description,
+events.time_stamp,
+events.time_stamp::date as date,
+event_types.description as event,
+to_tsvector(events.description) as search
+from events
+inner join event_types
+on event_types.id = events.event_type_id
+where target_id = 28
+order by time_stamp;
+```
+
+[More on to_tsvector()](https://www.postgresql.org/docs/current/textsearch-controls.html)
+
+Find thermal results - 
+
+```
+select id, date, title
+from enceladus_events
+where date
+between '2005-02-01'::date
+and '2005-02-28'::date
+and search @@ to_tsquery('thermal');
+```
+
+[Additional operators](https://www.postgresql.org/docs/current/functions-textsearch.html)
+
+Aggregate query to see which team was most active on second flyby - 
+
+```
+select count(1) as activity, teams.description
+from events
+inner join teams on teams.id=team_id
+where time_stamp::date='2005-03-09'
+and target_id = 28
+group by teams.description
+order by activity desc;
+```
