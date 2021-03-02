@@ -629,3 +629,33 @@ and target_id = 28
 group by teams.description
 order by activity desc;
 ```
+
+### Better full-text search
+
+Every flyby has had the term "closest" in the title field. We need to index the title field as well -
+
+```
+drop view if exists enceladus_events;
+create view enceladus_events as
+select
+events.id,
+events.title,
+events.description,
+events.time_stamp,
+events.time_stamp::date as date,
+event_types.description as event,
+to_tsvector(
+concat(events.description, ' ' ,events.title) ) as search
+from events
+inner join event_types
+on event_types.id = events.event_type_id where target_id = 28
+order by time_stamp;
+```
+
+```
+select id, title from enceladus_events where search @@ to_tsquery('closest');
+```
+
+Returns 25 rows (only 23 flybys)
+
+### Using matertialized views
