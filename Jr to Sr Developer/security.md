@@ -92,6 +92,8 @@ Everywhere that has a connection to an outside system has vulnerabilities.
 
 ratelimiter package helps protect against DDoS attacks.
 
+[More on rate limits](https://blog.logrocket.com/rate-limiting-node-js/)
+
 ## Authentication
 
 Make sure people are who they say they are. Cookies and tokens are helpful in authenticating users.
