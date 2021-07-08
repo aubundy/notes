@@ -20,9 +20,27 @@ Many different types (MongoDB, Cassandra, Redis, Neo4J). You do not have to defi
 
 MongoDB stores data in documents (everything about a user would be in their document). It also has its own query language
 
+## Setup
+
+`brew install redis`
+
+`brew services start redis`
+
+### node-redis
+
+```
+const redis = require('redis');
+const redisClient = redis.createClient({
+  host: keys.redisHost,
+  port: keys.redisPort,
+  retry_strategy: () => 1000
+});
+const redisPublisher = redisClient.duplicate();
+```
+
 ## [Redis Commands](https://redis.io/commands)
 
-`src/redis-server` - starts redis
+~~`src/redis-server` - starts redis~~
 
 `src/redis-cli` - access redis through terminal
 
