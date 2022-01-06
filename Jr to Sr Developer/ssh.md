@@ -46,7 +46,7 @@ RSA allows you to SSH without a password.
 Create a ~/.ssh folder on your computer. Generate a public and private rsa file if there is not one already.
 
 `ssh-keygen -C "your@email.com"`, then choose the file to save the key.
-`ssh-keygen -t rsa -b 4096 -C "your_email@example.com" might be better.`
+`ssh-keygen -t rsa -b 4096 -C "your_email@example.com"` might be better.
 `-t` selects the type of algorithm `-b` selects the key size
 
 Then share your public key with the server -> `pbcopy < ~/.ssh/file_path_to_public_key`. Login to server then `nano file_name, copy public key`.
@@ -60,3 +60,11 @@ The github workflow for every time you start up the terminal:
  - clone repo (`git clone [repo@repo_address]`)
 
 ### [To change existing Github repo acces from HTTPS to SSH](https://pandammonium.org/how-to-change-a-git-repository-from-https-to-ssh/)
+
+### Windows - Git Bash
+
+[Could not open a connection to your authentication agent](https://stackoverflow.com/a/17848593/16482150)
+
+### Windows - PowerShell
+
+[Error connecting to agent: No such file or directory](https://debugah.com/windows-ssh-add-error-connecting-to-agent-no-such-file-or-directory-solved-12441/)
