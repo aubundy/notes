@@ -10,15 +10,16 @@ secure shell protocol for machines to communicate
 
 ## SSH Commands
 
-ssh {user}@{host} - logs in to connected computer
+`ssh {user}@{host}` - logs in to connected computer
 
-rsync -av . {user}@{host} - copies current file to connected computer
+`rsync -av . {user}@{host}` - copies current file to connected computer
 
 ## How SSH works
 
 ### Symmetrical Encryption
 
 uses one secret key for both parties by using a key exchange algorithm. The key is unique for each ssh session and is generated before the client is authenticated
+
 ### Asymmetrical Encryption
 
 the key exchange algorithm uses asymmetrical encryption. Each user has a public/private key pair. A machine that is encrypted with the public key, can only be decrypted by the private key.
@@ -44,18 +45,18 @@ Once the secure connection is established, the server needs to authenticate the 
 RSA allows you to SSH without a password.
 Create a ~/.ssh folder on your computer. Generate a public and private rsa file if there is not one already.
 
-ssh-keygen -C "your@email.com", then choose the file to save the key.
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com" might be better.
--t selects the type of algorithm -b selects the key size
+`ssh-keygen -C "your@email.com"`, then choose the file to save the key.
+`ssh-keygen -t rsa -b 4096 -C "your_email@example.com" might be better.`
+`-t` selects the type of algorithm `-b` selects the key size
 
-Then share your public key with the server -> pbcopy < ~/.ssh/file_path_to_public_key. Login to server then nano file_name, copy public key.
+Then share your public key with the server -> `pbcopy < ~/.ssh/file_path_to_public_key`. Login to server then `nano file_name, copy public key`.
 
-You may need to add the specific rsa file if there are multiple (ssh-add file_path_to_private_key)
+You may need to add the specific rsa file if there are multiple (`ssh-add [file_path_to_private_key]`)
 
 The github workflow for every time you start up the terminal:
- - add ssh key (ssh-add file_path_to_private_key)
-  - ssh add -l lists all current identities -D removes the current identities
- - verify github connection (ssh -T git@github.com)
- - clone repo (git clone repo@repo_address)
+ - add ssh key (`ssh-add [file_path_to_private_key]`)
+  - `ssh add -l` lists all current identities -D removes the current identities
+ - verify github connection (`ssh -T git@github.com`)
+ - clone repo (`git clone [repo@repo_address]`)
 
 ### [To change existing Github repo acces from HTTPS to SSH](https://pandammonium.org/how-to-change-a-git-repository-from-https-to-ssh/)
